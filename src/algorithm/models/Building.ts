@@ -3,14 +3,14 @@ import { Passenger } from "./Passenger";
 import { RoundRobin } from "../controllers/RoundRobin";
 import { ThreePassage } from "../controllers/ThreePassage";
 import { Zoning } from "../controllers/Zoning";
-import { CallType, Dir, Strategies, sleep } from "../utils";
+import { CallType, Dir, Strategies, sleep, type ElevatorConfigI } from "../utils";
 import { Call } from "./Call";
 import { DEBUG } from "../settings";
 
 export class Building {
-  private N: number; // Number of floors
-  private L: number; // Number of elevators
-  private U: number; // Building population
+  private N: number = 0; // Number of floors
+  private L: number = 0; // Number of elevators
+  private U: number = 0; // Building population
   private algorithm: Strategies; // Desired algorithm will be passed as a CL arg
 
   private elevatorGroup: Elevator[] = []; // An array of L elevators
@@ -20,18 +20,10 @@ export class Building {
   private zoning: Zoning;
   private threePassage: ThreePassage;
 
-  constructor(floors: number, elevators: number, population: number) {
-    this.N = floors;
-    this.L = elevators;
-    this.U = population;
-
+  constructor() {
     this.roundRobin = new RoundRobin();
     this.zoning = new Zoning();
     this.threePassage = new ThreePassage();
-  }
-
-  public getN(): number {
-    return this.N;
   }
 
   public setAlgorithm(algorithm: Strategies) {
@@ -41,17 +33,20 @@ export class Building {
   /**
    * Creates L Elevator objects in the elevatorGroup array.
    */
-  public createElevators(): void {
+  public setElevators(L: number, config: ElevatorConfigI): void {
+    for (let i = 0; i < this.L; ++i) {
+      this.elevatorGroup[i].destroy();
+    }
+
+    this.elevatorGroup = [];
+    this.L = L;
+
     for (let i = 0; i < this.L; ++i) {
       setTimeout(() => {
         const el = new Elevator(
           i,
           this.algorithm,
-          300,
-          300,
-          1,
-          8,
-          3,
+          config,
           this.N,
           this.L,
           () => this.floors,
@@ -65,7 +60,10 @@ export class Building {
   /**
    * Creates N Floor objects in the floors array.
    */
-  public createFloors(): void {
+  public setFloors(N: number): void {
+    this.N = N;
+    this.U = 4 * N * 8;
+    this.floors = [];
     for (let i = 0; i < this.N; ++i) {
       this.floors.push(0);
     }

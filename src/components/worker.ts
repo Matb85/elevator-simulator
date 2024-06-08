@@ -1,17 +1,21 @@
 import { Building } from "../algorithm/models/Building";
+import type { ElevatorConfigI } from "../algorithm/utils";
 import type { SettingsI } from "./store";
 
-let building: Building;
+const building = new Building();
 
 function setUpBuilding({ floors, elevators, capacity, speed, strategy }: SettingsI) {
-  if (building) return;
-  building = new Building(floors, elevators, 80);
+  const config: ElevatorConfigI = {
+    passengerLoadingTime: 300, // Always 1 second
+    passengerUnloadingTime: 300, // Always 1 second
+    velocity: speed / 100, // Always 1 meter per second
+    capacity: capacity, // The capacity if always 1/4 of the entire building population
+    interFloorHeight: 3, // Always 3 meters
+  };
 
   building.setAlgorithm(strategy); // Sets algorithm in Building class
-
-  building.createFloors();
-
-  building.createElevators();
+  building.setFloors(floors);
+  building.setElevators(elevators, config);
 }
 
 onmessage = m => {

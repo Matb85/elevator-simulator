@@ -1,39 +1,34 @@
 import { Call } from "./Call";
 import type { Passenger } from "./Passenger";
 import { DEBUG } from "../settings";
-import { sleep, Strategies, Dir, CallType } from "../utils";
+import { sleep, Strategies, Dir, CallType, type ElevatorConfigI } from "../utils";
 import { CallPriorityQueue } from "../PriorityQueue";
 
 export class Elevator {
-  entryCalls: Call[] = []; // Holds entryCalls
-  exitCalls: Call[] = []; // Holds exitCalls
-  sequence: CallPriorityQueue = new CallPriorityQueue();
+  private RUNNING = true;
 
-  ID: number;
-  currentFloor: number;
-  direction: Dir = Dir.UP; // 1- Up, 0 - Down
-  idle = true;
+  private entryCalls: Call[] = []; // Holds entryCalls
+  private exitCalls: Call[] = []; // Holds exitCalls
+  public sequence: CallPriorityQueue = new CallPriorityQueue();
 
-  passengerLoadingTime: number; // Always 1 second
-  passengerUnloadingTime: number; // Always 1 second
-  velocity: number; // Always 1 meter per second
-  capacity: number; // The capacity if always 1/4 of the entire building population
-  interFloorHeight: number; // Always 3 meters
-  N: number;
-  L: number;
+  public ID: number;
+  public currentFloor: number;
+  public direction: Dir = Dir.UP; // 1- Up, 0 - Down
+  public idle = true;
+
+  public c: ElevatorConfigI;
+  public N: number;
+  public L: number;
 
   private currentPassengers: number[] = [];
 
   getFloors: () => number[];
   decreaseFloors: (x: number) => void;
+
   constructor(
     ID: number,
     algorithm: Strategies,
-    passengerLoadingTime: number,
-    passengerUnloadingTime: number,
-    velocity: number,
-    capacity: number,
-    interFloorHeight: number,
+    c: ElevatorConfigI,
     N: number,
     L: number,
     getFloors: () => number[],
@@ -43,12 +38,8 @@ export class Elevator {
     this.N = N;
     this.L = L;
     this.currentFloor = Math.floor(N / 2);
-    this.passengerLoadingTime = passengerLoadingTime;
-    this.passengerUnloadingTime = passengerUnloadingTime;
-    this.velocity = velocity;
-    this.capacity = capacity;
-    this.interFloorHeight = interFloorHeight;
 
+    this.c = c;
     this.getFloors = getFloors;
     this.decreaseFloors = decreaseFloors;
 
@@ -65,6 +56,12 @@ export class Elevator {
     this.animateElevator();
   }
 
+  public destroy(): void {
+    this.RUNNING = false;
+    this.entryCalls = [];
+    this.exitCalls = [];
+  }
+
   public setCurrentFloor(currentFloor: number): void {
     this.currentFloor = currentFloor;
   }
@@ -74,7 +71,7 @@ export class Elevator {
    * The idea is to reduce the waiting time for future passengers arriving at the lobby.
    */
   public async upPeakThread(): Promise<void> {
-    while (true) {
+    while (true && this.RUNNING) {
       // Check if the elevator is idle
       if (this.idle) {
         // Wait 7 seconds
@@ -101,7 +98,7 @@ export class Elevator {
   public async zoningThread(): Promise<void> {
     const Z = Math.ceil(this.N / this.L);
 
-    while (true) {
+    while (true && this.RUNNING) {
       // Check if the elevator is idle
       //console.log(this.ID, this.sequence.getHeap(), this.idle);
       if (this.idle) {
@@ -129,7 +126,7 @@ export class Elevator {
    * into the elevator’s internal sequence list.
    */
   private async startPolling(): Promise<void> {
-    while (true) {
+    while (true && this.RUNNING) {
       this.performJob();
       await sleep(200);
     }
@@ -299,7 +296,7 @@ export class Elevator {
       this.redefinePassage();
     }
 
-    await sleep(this.passengerLoadingTime);
+    await sleep(this.c.passengerLoadingTime);
 
     // Simulate elevator movement through the floors of the building
     while (this.currentFloor != tempCall.getFloor() && this.currentFloor >= 0 && this.currentFloor <= this.N - 1) {
@@ -314,7 +311,7 @@ export class Elevator {
         console.log("\n\n\n\n! + ! + ! Elevator is out of range - this.performJob() ! + ! + !\n\n\n\n");
         break;
       }
-      await sleep(this.velocity * this.interFloorHeight * 200);
+      await sleep(this.c.velocity * this.c.interFloorHeight * 200);
 
       if (DEBUG) {
         console.log(
@@ -335,7 +332,7 @@ export class Elevator {
 
     setTimeout(() => {
       this.idle = true;
-    }, this.passengerUnloadingTime);
+    }, this.c.passengerUnloadingTime);
   }
 
   /**

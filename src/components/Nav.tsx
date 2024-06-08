@@ -52,8 +52,6 @@ export default function SideBar(props: any) {
   const [autoPeople, setAutoPeople] = useState(false);
 
   useEffect(() => {
-    console.log("heehdklsajflashf", autoPeople);
-
     if (autoPeople) {
       interval = setInterval(() => {
         setGeneratePerson({
@@ -157,6 +155,8 @@ export default function SideBar(props: any) {
             </Stack>
             <Stack direction="row" gap={1}>
               <InputNumber
+                min={1}
+                max={100}
                 placeholder="Elevator speed"
                 value={settings.speed}
                 onChange={(event, val) => val && val > 0 && setSettings({ ...settings, speed: val })}

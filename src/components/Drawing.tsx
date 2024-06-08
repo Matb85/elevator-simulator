@@ -3,17 +3,20 @@ import { Box } from "@mui/material";
 import "./Drawing.css";
 
 import Worker from "./worker.ts?worker";
-import { setGeneratePerson, setSettings, setStatus, useGeneratePerson, useSettings, useStatus } from "./store";
+import {
+  setGeneratePerson,
+  setSettings,
+  setStatus,
+  useGeneratePerson,
+  useSettings,
+  useStatus,
+  type SettingsI,
+} from "./store";
 import { useEffect } from "react";
 
-let worker: Worker;
-let workerReady = false;
+const worker = new Worker();
 
-function startWorker(settings: any) {
-  if (workerReady == true) terminateWorker();
-
-  worker = new Worker();
-
+function startWorker(settings: SettingsI) {
   console.log("new worker settings", settings);
 
   worker.postMessage({ ...settings, type: "es-update-settings" });
@@ -28,16 +31,6 @@ function startWorker(settings: any) {
       el2.innerText = m.data.floors[i];
     }
   };
-}
-
-function terminateWorker() {
-  try {
-    worker?.terminate();
-  } catch (e: any) {
-    console.error("HANDLED ERROR");
-    console.error(e);
-  }
-  workerReady = false;
 }
 
 export default function Drawing(props: any) {
@@ -60,7 +53,7 @@ export default function Drawing(props: any) {
 
   useEffect(() => {
     if (status.running) startWorker(settings);
-    else terminateWorker();
+    else startWorker({ ...settings, elevators: 0 });
   }, [status]);
 
   return (
