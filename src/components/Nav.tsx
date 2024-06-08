@@ -1,16 +1,27 @@
-import { useState } from "react";
-import Button from "@mui/material/Button";
-import Drawer from "@mui/material/Drawer";
-import Toolbar from "@mui/material/Toolbar";
-import Divider from "@mui/material/Divider";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import AppBar from "@mui/material/AppBar";
-import { Box, Checkbox, FormControlLabel, IconButton, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+import {
+  AppBar,
+  Box,
+  Button,
+  Checkbox,
+  Divider,
+  Drawer,
+  FormControlLabel,
+  IconButton,
+  List,
+  ListItem,
+  Radio,
+  RadioGroup,
+  Stack,
+  Toolbar,
+  Typography,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import InputNumber from "./InputNumber";
+import { setGeneratePerson, setSettings, setStatus, useGeneratePerson, useSettings, useStatus } from "./store";
+import { Strategies } from "../algorithm/utils";
+
+let interval: ReturnType<typeof setInterval>;
 
 export default function SideBar(props: any) {
   const drawerWidth = 300;
@@ -34,7 +45,27 @@ export default function SideBar(props: any) {
     }
   };
 
-  const [value, setValue] = useState<number | null>(null);
+  const settings = useSettings();
+  const person = useGeneratePerson();
+  const status = useStatus();
+
+  const [autoPeople, setAutoPeople] = useState(false);
+
+  useEffect(() => {
+    console.log("heehdklsajflashf", autoPeople);
+
+    if (autoPeople) {
+      interval = setInterval(() => {
+        setGeneratePerson({
+          from: Math.round(Math.random() * (settings.floors - 1)),
+          to: Math.round(Math.random() * (settings.floors - 1)),
+          ready: true,
+        });
+      }, 800);
+    } else {
+      clearInterval(interval);
+    }
+  }, [autoPeople]);
 
   const drawer = (
     <>
@@ -42,37 +73,30 @@ export default function SideBar(props: any) {
       <Divider />
       <List>
         <ListItem>
-          <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            <Typography>Add a Person</Typography>
-
-            <InputNumber
-              placeholder="From Floor"
-              aria-label="From Floor"
-              value={value}
-              onChange={(event, val) => setValue(val)}
-            />
-            <InputNumber
-              placeholder="To Floor"
-              aria-label="To Floor"
-              value={value}
-              onChange={(event, val) => setValue(val)}
-            />
-
-            <Button variant="contained">Add a person</Button>
-
-            <FormControlLabel control={<Checkbox defaultChecked />} label="Generate people automativally" />
-          </Box>
-        </ListItem>
-        <Divider />
-        <ListItem>
-          <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+          <Box component="section" gap={1} sx={{ display: "flex", flexDirection: "column" }}>
             <Typography>Simulation controls</Typography>
             <Box component="section" sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
-              <Button variant="contained">Start</Button>
-              <Button variant="contained" color="error">
+              <Button disabled={status.running} variant="contained" onClick={() => setStatus({ running: true })}>
+                Start
+              </Button>
+              <Button
+                disabled={!status.running}
+                variant="contained"
+                color="error"
+                onClick={() => setStatus({ running: false })}
+              >
                 Stop
               </Button>
-              <Button variant="contained" color="secondary">
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => {
+                  setStatus({ running: false });
+                  setTimeout(() => {
+                    setStatus({ running: true });
+                  }, 100);
+                }}
+              >
                 Reset
               </Button>
             </Box>
@@ -80,36 +104,81 @@ export default function SideBar(props: any) {
         </ListItem>
         <Divider />
         <ListItem>
+          <Box component="section" gap={1} sx={{ display: "flex", flexDirection: "column" }}>
+            <Typography>Adding people</Typography>
+            <Stack direction="row" gap={1}>
+              <InputNumber
+                placeholder="From Floor"
+                value={person.from}
+                min={0}
+                max={settings.floors - 1}
+                onChange={(event, val) => val && val >= 0 && setGeneratePerson({ ...person, from: val })}
+              />
+              <InputNumber
+                placeholder="To Floor"
+                value={person.to}
+                min={0}
+                max={settings.floors - 1}
+                onChange={(event, val) => val && val >= 0 && setGeneratePerson({ ...person, to: val })}
+              />
+            </Stack>
+            <Button onClick={() => setGeneratePerson({ ...person, ready: true })} variant="contained">
+              Add a person
+            </Button>
+
+            <FormControlLabel
+              control={<Checkbox />}
+              label="Generate people automatically every 800ms"
+              value={autoPeople}
+              onChange={() => setAutoPeople(!autoPeople)}
+            />
+          </Box>
+        </ListItem>
+        <Divider />
+        <ListItem>
           <Box component="section" sx={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             <Typography>Settings</Typography>
 
-            <InputNumber
-              placeholder="Number of floors"
-              aria-label="Number of floors"
-              value={value}
-              onChange={(event, val) => setValue(val)}
-            />
-            <InputNumber
-              placeholder="Number of elevators"
-              aria-label="Number of elevators"
-              value={value}
-              onChange={(event, val) => setValue(val)}
-            />
-            <InputNumber
-              placeholder="Elevator speed"
-              aria-label="Elevator speed"
-              value={value}
-              onChange={(event, val) => setValue(val)}
-            />
-            <InputNumber
-              placeholder="Elevator capacity"
-              aria-label="Elevator capacity"
-              value={value}
-              onChange={(event, val) => setValue(val)}
-            />
-            <Button variant="contained">Update</Button>
+            <Button variant="contained" onClick={() => setSettings({ ...settings, ready: true })}>
+              Update settings
+            </Button>
 
-            <FormControlLabel control={<Checkbox defaultChecked />} label="Generate people automativally" />
+            <Stack direction="row" gap={1}>
+              <InputNumber
+                placeholder="Number of floors"
+                value={settings.floors}
+                onChange={(event, val) => val && val > 0 && setSettings({ ...settings, floors: val })}
+              />
+              <InputNumber
+                placeholder="Number of elevators"
+                value={settings.elevators}
+                onChange={(event, val) => val && val > 0 && setSettings({ ...settings, elevators: val })}
+              />
+            </Stack>
+            <Stack direction="row" gap={1}>
+              <InputNumber
+                placeholder="Elevator speed"
+                value={settings.speed}
+                onChange={(event, val) => val && val > 0 && setSettings({ ...settings, speed: val })}
+              />
+              <InputNumber
+                placeholder="Elevator capacity"
+                value={settings.capacity}
+                onChange={(event, val) => val && val > 0 && setSettings({ ...settings, capacity: val })}
+              />
+            </Stack>
+            <Typography variant="caption" style={{ marginBottom: "-0.5rem" }}>
+              Strategy
+            </Typography>
+            <RadioGroup
+              onChange={(event, val) => val && setSettings({ ...settings, strategy: parseInt(val) })}
+              defaultValue={Strategies.ZONING}
+              name="radio-buttons-group"
+            >
+              <FormControlLabel value={Strategies.ROUND_ROBIN} control={<Radio />} label="Round Robin" />
+              <FormControlLabel value={Strategies.THREE_PASSAGE} control={<Radio />} label="Three Passage" />
+              <FormControlLabel value={Strategies.ZONING} control={<Radio />} label="Zoning" />
+            </RadioGroup>
           </Box>
         </ListItem>
       </List>

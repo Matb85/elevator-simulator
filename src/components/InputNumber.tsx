@@ -5,6 +5,7 @@ import {
   numberInputClasses,
 } from "@mui/base/Unstable_NumberInput";
 import { styled } from "@mui/system";
+import Typography from "@mui/material/Typography";
 
 const CustomNumberInput = React.forwardRef(function CustomNumberInput(
   props: NumberInputProps,
@@ -33,7 +34,14 @@ const CustomNumberInput = React.forwardRef(function CustomNumberInput(
 });
 
 export default function NumberInputIntroduction(props: NumberInputProps) {
-  return <CustomNumberInput {...props} />;
+  return (
+    <div>
+      <Typography variant="caption" style={{ marginBottom: "-0.5rem" }}>
+        {props.placeholder}
+      </Typography>
+      <CustomNumberInput {...props} />
+    </div>
+  );
 }
 
 const blue = {
@@ -90,6 +98,7 @@ const StyledInputRoot = styled("div")(
 
 const StyledInputElement = styled("input")(
   ({ theme }) => `
+  width: 100%;
   font-size: 0.875rem;
   font-family: inherit;
   font-weight: 400;
