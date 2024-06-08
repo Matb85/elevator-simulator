@@ -1,0 +1,19 @@
+.building {
+  border-collapse: collapse;
+}
+.building {
+  border: none;
+}
+.building td {
+  border-top: solid 2px rgb(148, 148, 148);
+  border-bottom: solid 2px rgb(148, 148, 148);
+}
+
+.elevator {
+  width: 1.5rem;
+  height: 2rem;
+  background-color: rgb(66, 66, 66);
+  position: absolute;
+  top: 0%;
+  left: 0%;
+}
