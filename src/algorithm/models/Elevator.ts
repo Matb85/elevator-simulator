@@ -22,6 +22,8 @@ export class Elevator {
   N: number;
   L: number;
 
+  private currentPassengers: number[] = [];
+
   getFloors: () => number[];
   decreaseFloors: (x: number) => void;
   constructor(
@@ -140,6 +142,7 @@ export class Elevator {
     // Here we are looking for the exitCall of the current entryCall
     if (tempCall.getType() == CallType.ENTRY && tempCall.getFloor() == this.currentFloor) {
       this.decreaseFloors(tempCall.getFloor());
+
       // Traverse carFloors array to look for a
       // exitCall with the same ID as tempCall
       for (let i = 0; i < this.exitCalls.length; ++i) {
@@ -147,24 +150,8 @@ export class Elevator {
 
         if (tempExitCall.getID() != tempCall.getID()) continue;
 
-        // Assign passage to exitCall
-        // Same direction and higher than currentFloor - P1
-        // Opposite direction - P2
-
-        if (this.direction == Dir.UP) {
-          if (tempExitCall.getFloor() > this.currentFloor && tempExitCall.getDirection() == this.direction) {
-            tempExitCall.setPassage(1);
-          } else {
-            tempExitCall.setPassage(2);
-          }
-        } else {
-          if (tempExitCall.getFloor() < this.currentFloor && tempExitCall.getDirection() == this.direction) {
-            tempExitCall.setPassage(1);
-          } else {
-            tempExitCall.setPassage(2);
-          }
-        }
-
+        this.setExitCallPassage(tempExitCall);
+        this.currentPassengers.push(tempExitCall.getFloor());
         // Add exitCall to sequence
         this.sequence.push(tempExitCall);
         // Remove exitCall from exitCalls array
@@ -175,13 +162,13 @@ export class Elevator {
 
     // Check the Calls in the sequence, if the sequence is not empty
     // Here we are looking for all exitCalls and entryCalls that can be removed from sequence
-    if (this.sequence.isEmpty()) return;
-
     console.log("---------------------------");
     console.log(this.sequence.getHeap().map(x => (x.getType() == 1 ? "entry" : "exit")));
     console.log(this.sequence.getHeap().map(x => (x.getDirection() == 1 ? "up" : "down")));
     console.log(this.sequence.getHeap().map(x => x.getFloor()));
     console.log(this.sequence.getHeap().map(x => x.getID()));
+    if (this.sequence.isEmpty()) return;
+
     // Traverse the Calls in the sequence to find out if
     // any Calls need to be remove, because their floor matches the currentFloor of the elevator
     let i = 0;
@@ -204,25 +191,9 @@ export class Elevator {
           const tempExitCall = this.exitCalls[i];
 
           if (tempExitCall.getID() != call.getID()) continue;
+          this.setExitCallPassage(tempExitCall);
 
-          // Assign passage to exitCall
-          // Same direction and higher than currentFloor - P1
-          // Opposite direction - P2
-
-          if (this.direction == Dir.UP) {
-            if (tempExitCall.getFloor() > this.currentFloor && tempExitCall.getDirection() == this.direction) {
-              tempExitCall.setPassage(1);
-            } else {
-              tempExitCall.setPassage(2);
-            }
-          } else {
-            if (tempExitCall.getFloor() < this.currentFloor && tempExitCall.getDirection() == this.direction) {
-              tempExitCall.setPassage(1);
-            } else {
-              tempExitCall.setPassage(2);
-            }
-          }
-
+          this.currentPassengers.push(tempExitCall.getFloor());
           // Add exitCall to sequence
           this.sequence.push(tempExitCall);
           // Remove exitCall from exitCalls array
@@ -230,10 +201,11 @@ export class Elevator {
           break;
         }
 
-        // Remove the entryCall from the sequenc
+        // Remove the entryCall from the sequence
         console.log("decreasing");
         this.decreaseFloors(this.currentFloor);
         this.sequence.remove(call);
+
         i = 0;
       }
       i += 1;
@@ -253,7 +225,7 @@ export class Elevator {
    */
   private redefinePassage(): void {
     for (const tempCall of this.sequence.getHeap()) {
-      if (!tempCall.isSpecialCall()) this.setCallPassage(tempCall);
+      if (!tempCall.isSpecialCall()) this.setEntryCallPassage(tempCall);
     }
   }
 
@@ -261,7 +233,12 @@ export class Elevator {
    * Animates the current position of the elevator in DOM.
    */
   private animateElevator(): void {
-    postMessage({ ID: this.ID, currentFloor: this.currentFloor, floors: this.getFloors() });
+    postMessage({
+      ID: this.ID,
+      currentFloor: this.currentFloor,
+      floors: this.getFloors(),
+      currentPassengers: this.currentPassengers.length,
+    });
   }
 
   /**
@@ -349,6 +326,7 @@ export class Elevator {
       }
 
       this.checkSequence(tempCall);
+      this.currentPassengers = this.currentPassengers.filter(x => x != this.currentFloor);
       this.animateElevator();
       if (DEBUG) {
         this.displayElevator();
@@ -371,7 +349,7 @@ export class Elevator {
 
     this.exitCalls.push(exitCall);
 
-    this.setCallPassage(entryCall);
+    this.setEntryCallPassage(entryCall);
     this.sequence.push(entryCall);
 
     if (DEBUG) {
@@ -397,7 +375,26 @@ export class Elevator {
     }
   }
 
-  private setCallPassage(tempCall: Call) {
+  private setExitCallPassage(tempExitCall: Call) {
+    // Assign passage to exitCall
+    // Same direction and higher than currentFloor - P1
+    // Opposite direction - P2
+
+    if (this.direction == Dir.UP) {
+      if (tempExitCall.getFloor() > this.currentFloor && tempExitCall.getDirection() == this.direction) {
+        tempExitCall.setPassage(1);
+      } else {
+        tempExitCall.setPassage(2);
+      }
+    } else {
+      if (tempExitCall.getFloor() < this.currentFloor && tempExitCall.getDirection() == this.direction) {
+        tempExitCall.setPassage(1);
+      } else {
+        tempExitCall.setPassage(2);
+      }
+    }
+  }
+  private setEntryCallPassage(tempCall: Call) {
     // Assign passage to a newly arrived entryCall
 
     // Same direction and higher than currentFloor - P1
