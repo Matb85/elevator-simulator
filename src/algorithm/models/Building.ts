@@ -6,6 +6,7 @@ import { Zoning } from "../controllers/Zoning";
 import { CallType, Dir, Strategies, sleep, type ElevatorConfigI } from "../utils";
 import { Call } from "./Call";
 import { DEBUG } from "../settings";
+import { FloorTracker } from "../FloorTracker";
 
 export class Building {
   private N: number = 0; // Number of floors
@@ -14,7 +15,7 @@ export class Building {
   private algorithm: Strategies; // Desired algorithm will be passed as a CL arg
 
   private elevatorGroup: Elevator[] = []; // An array of L elevators
-  private floors: number[] = []; // An array of N floors
+  private floors: FloorTracker; // An array of N floors
 
   private roundRobin: RoundRobin;
   private zoning: Zoning;
@@ -34,7 +35,7 @@ export class Building {
    * Creates L Elevator objects in the elevatorGroup array.
    */
   public setElevators(L: number, config: ElevatorConfigI): void {
-    for (let i = 0; i < this.L; ++i) {
+    for (let i = 0; i < this.elevatorGroup.length; ++i) {
       this.elevatorGroup[i].destroy();
     }
 
@@ -43,15 +44,7 @@ export class Building {
 
     for (let i = 0; i < this.L; ++i) {
       setTimeout(() => {
-        const el = new Elevator(
-          i,
-          this.algorithm,
-          config,
-          this.N,
-          this.L,
-          () => this.floors,
-          (x: number) => (this.floors[x] -= 1)
-        );
+        const el = new Elevator(i, this.algorithm, config, this.N, this.L, this.floors);
         this.elevatorGroup.push(el);
       }, i * 50);
     }
@@ -62,11 +55,7 @@ export class Building {
    */
   public setFloors(N: number): void {
     this.N = N;
-    this.U = 4 * N * 8;
-    this.floors = [];
-    for (let i = 0; i < this.N; ++i) {
-      this.floors.push(0);
-    }
+    this.floors = new FloorTracker(N);
   }
 
   /**
@@ -91,7 +80,8 @@ export class Building {
     const entryCall = new Call(CallType.ENTRY, entryFloor, direction, ID);
 
     //console.log("entryFloor", entryFloor);
-    this.floors[entryFloor] += 1;
+    this.floors.peopleWaiting[entryFloor] += 1;
+    this.floors.peopleExpected[exitFloor] += 1;
 
     if (DEBUG) {
       console.log(exitFloor);

@@ -27,8 +27,10 @@ function startWorker(settings: SettingsI) {
     el.style.setProperty("--current-floor", m.data.currentFloor + "");
     el.innerText = m.data.currentPassengers;
     for (let i = 0; i < settings.floors; i++) {
-      const el2 = document.getElementById("floor-" + i) as HTMLElement;
-      el2.innerText = m.data.floors[i];
+      let el2 = document.getElementById("waiting-" + i) as HTMLElement;
+      el2.innerText = m.data.peopleWaiting[i];
+      el2 = document.getElementById("expected-" + i) as HTMLElement;
+      el2.innerText = m.data.peopleExpected[i];
     }
   };
 }
@@ -86,11 +88,11 @@ export default function Drawing(props: any) {
             {Array.from(Array(settings.floors).keys()).map(i => (
               <tr key={i}>
                 <td>{settings.floors - i - 1}</td>
-                <td id={"floor-" + (settings.floors - i - 1)}>0</td>
+                <td id={"waiting-" + (settings.floors - i - 1)}>0</td>
                 {Array.from(Array(settings.elevators).keys()).map(i => (
                   <td key={i} style={{ width: "1.5rem", height: "2rem", backgroundColor: "lightgray" }}></td>
                 ))}
-                <td>0</td>
+                <td id={"expected-" + (settings.floors - i - 1)}> 0</td>
               </tr>
             ))}
           </tbody>

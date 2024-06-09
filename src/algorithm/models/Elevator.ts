@@ -3,6 +3,7 @@ import type { Passenger } from "./Passenger";
 import { DEBUG } from "../settings";
 import { sleep, Strategies, Dir, CallType, type ElevatorConfigI } from "../utils";
 import { CallPriorityQueue } from "../PriorityQueue";
+import type { FloorTracker } from "../FloorTracker";
 
 export class Elevator {
   private RUNNING = true;
@@ -22,26 +23,16 @@ export class Elevator {
 
   private currentPassengers: number[] = [];
 
-  getFloors: () => number[];
-  decreaseFloors: (x: number) => void;
+  private floors: FloorTracker;
 
-  constructor(
-    ID: number,
-    algorithm: Strategies,
-    c: ElevatorConfigI,
-    N: number,
-    L: number,
-    getFloors: () => number[],
-    decreaseFloors: (x: number) => void
-  ) {
+  constructor(ID: number, algorithm: Strategies, c: ElevatorConfigI, N: number, L: number, floorTracker: FloorTracker) {
     this.ID = ID;
     this.N = N;
     this.L = L;
-    this.currentFloor = Math.floor(N / 2);
-
     this.c = c;
-    this.getFloors = getFloors;
-    this.decreaseFloors = decreaseFloors;
+
+    this.currentFloor = Math.floor(N / 2);
+    this.floors = floorTracker;
 
     this.startPolling();
     // Start this thread only if user chose Up-peak
@@ -138,7 +129,7 @@ export class Elevator {
   private checkSequence(curCall: Call): void {
     // Here we are looking for the exitCall of the current entryCall
     if (curCall.getType() == CallType.ENTRY && curCall.getFloor() == this.currentFloor) {
-      this.decreaseFloors(curCall.getFloor());
+      this.floors.peopleWaiting[curCall.getFloor()] -= 1;
 
       // Traverse carFloors array to look for a
       // exitCall with the same ID as tempCall
@@ -205,7 +196,7 @@ export class Elevator {
 
         // Remove the entryCall from the sequence
         //console.log("decreasing");
-        this.decreaseFloors(this.currentFloor);
+        this.floors.peopleWaiting[curCall.getFloor()] -= 1;
         this.sequence.remove(tempCall);
       }
     }
@@ -279,7 +270,11 @@ export class Elevator {
       }
       this.redefinePassage();
       this.checkSequence(tempCall);
+
+      let passengersBefore = this.currentPassengers.length;
       this.currentPassengers = this.currentPassengers.filter(x => x != this.currentFloor);
+      this.floors.peopleExpected[this.currentFloor] -= passengersBefore - this.currentPassengers.length;
+
       this.animateElevator();
       if (DEBUG) {
         this.displayElevator();
@@ -392,7 +387,8 @@ export class Elevator {
     postMessage({
       ID: this.ID,
       currentFloor: this.currentFloor,
-      floors: this.getFloors(),
+      peopleWaiting: this.floors.peopleWaiting,
+      peopleExpected: this.floors.peopleExpected,
       currentPassengers: this.currentPassengers.length,
     });
   }
