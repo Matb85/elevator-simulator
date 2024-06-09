@@ -128,7 +128,11 @@ export class Elevator {
    */
   private checkSequence(curCall: Call): void {
     // Here we are looking for the exitCall of the current entryCall
-    if (curCall.getType() == CallType.ENTRY && curCall.getFloor() == this.currentFloor) {
+    if (
+      curCall.getType() == CallType.ENTRY &&
+      curCall.getFloor() == this.currentFloor &&
+      this.currentPassengers.length < this.c.capacity
+    ) {
       this.floors.peopleWaiting[curCall.getFloor()] -= 1;
 
       // Traverse carFloors array to look for a
@@ -178,7 +182,11 @@ export class Elevator {
       // and add exitCalls with the same ID to the sequence
       // The passengers whose entryCall is the same as currentFloor have boarded the elevator
       // and pressed a button inside the elevator (made a exitCall)
-      if (tempCall.getType() == CallType.ENTRY && tempCall.getFloor() == curCall.getFloor()) {
+      if (
+        tempCall.getType() == CallType.ENTRY &&
+        tempCall.getFloor() == curCall.getFloor() &&
+        this.currentPassengers.length < this.c.capacity
+      ) {
         // Traverse carFloors array
         for (let i = 0; i < this.exitCalls.length; ++i) {
           const tempExitCall = this.exitCalls[i];
