@@ -8,15 +8,13 @@ export function getRandomFloor(N: number) {
 
 export enum Strategies {
   ROUND_ROBIN,
+  UP_PEAK,
   THREE_PASSAGE,
   ZONING,
-  UP_PEAK_THREAD,
 }
 
 export enum Dir {
-  // 0 is down
   DOWN,
-  // 1 is up
   UP,
 }
 

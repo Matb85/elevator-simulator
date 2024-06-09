@@ -98,6 +98,9 @@ export class Building {
       case Strategies.ROUND_ROBIN:
         chosenElevator = this.roundRobin.choseElevator(this.elevatorGroup, this.L);
         break;
+      case Strategies.UP_PEAK:
+        chosenElevator = this.roundRobin.choseElevator(this.elevatorGroup, this.L);
+        break;
       case Strategies.ZONING:
         chosenElevator = this.zoning.choseElevator(this.L, this.N, pas.getEntryCall().getFloor());
         break;

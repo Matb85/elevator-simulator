@@ -36,7 +36,7 @@ export class Elevator {
 
     this.startPolling();
     // Start this thread only if user chose Up-peak
-    if (algorithm == Strategies.UP_PEAK_THREAD) {
+    if (algorithm == Strategies.UP_PEAK) {
       this.upPeakThread();
     }
 

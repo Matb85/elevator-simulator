@@ -176,6 +176,7 @@ export default function SideBar(props: any) {
               name="radio-buttons-group"
             >
               <FormControlLabel value={Strategies.ROUND_ROBIN} control={<Radio />} label="Round Robin" />
+              <FormControlLabel value={Strategies.UP_PEAK} control={<Radio />} label="Up Peak" />
               <FormControlLabel value={Strategies.THREE_PASSAGE} control={<Radio />} label="Three Passage" />
               <FormControlLabel value={Strategies.ZONING} control={<Radio />} label="Zoning" />
             </RadioGroup>
