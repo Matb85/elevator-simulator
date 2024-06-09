@@ -25,9 +25,9 @@ export class ThreePassage {
         const calls = elevator.sequence.size(); // Current number of calls in sequence
         const elevatorCost =
           (calls + 1) *
-          (elevator.velocity * elevator.interFloorHeight +
-            elevator.passengerLoadingTime +
-            elevator.passengerUnloadingTime); // Total cost of all calls plus new call
+          (elevator.c.velocity * elevator.c.interFloorHeight +
+            elevator.c.passengerLoadingTime +
+            elevator.c.passengerUnloadingTime); // Total cost of all calls plus new call
 
         if (elevatorCost < cost) {
           cost = elevatorCost;
@@ -36,7 +36,7 @@ export class ThreePassage {
       }
 
       // Check if thresholds is not reached
-      if (elevatorGroup[pick].sequence.size() / elevatorGroup[pick].capacity < 0.8) {
+      if (elevatorGroup[pick].sequence.size() / elevatorGroup[pick].c.capacity < 0.8) {
         flag = false;
       }
     }

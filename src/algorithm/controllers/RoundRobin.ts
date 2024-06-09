@@ -16,7 +16,7 @@ export class RoundRobin {
     let pick = ++this.counter % L;
 
     // Finding the first elevator whose capacity is not reached
-    while (elevatorGroup[pick].capacity < elevatorGroup[pick].sequence.size() + 1) {
+    while (elevatorGroup[pick].c.capacity < elevatorGroup[pick].sequence.size() + 1) {
       pick = ++this.counter % L;
     }
 
