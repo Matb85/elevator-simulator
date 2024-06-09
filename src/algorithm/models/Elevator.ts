@@ -67,6 +67,17 @@ export class Elevator {
   }
 
   /**
+   * Responsible for sorting calls assigned by the Group elevatorController
+   * into the elevator’s internal sequence list.
+   */
+  private async startPolling(): Promise<void> {
+    while (true && this.RUNNING) {
+      this.performJob();
+      await sleep(200);
+    }
+  }
+
+  /**
    * Generates a exitCall with floor 0 in order to relocate the car to the lobby.
    * The idea is to reduce the waiting time for future passengers arriving at the lobby.
    */
@@ -122,30 +133,19 @@ export class Elevator {
   }
 
   /**
-   * Responsible for sorting calls assigned by the Group elevatorController
-   * into the elevator’s internal sequence list.
-   */
-  private async startPolling(): Promise<void> {
-    while (true && this.RUNNING) {
-      this.performJob();
-      await sleep(200);
-    }
-  }
-
-  /**
    * Checks the sequence queue to find any Calls that need to be removed or added.
    */
-  private checkSequence(tempCall: Call): void {
+  private checkSequence(curCall: Call): void {
     // Here we are looking for the exitCall of the current entryCall
-    if (tempCall.getType() == CallType.ENTRY && tempCall.getFloor() == this.currentFloor) {
-      this.decreaseFloors(tempCall.getFloor());
+    if (curCall.getType() == CallType.ENTRY && curCall.getFloor() == this.currentFloor) {
+      this.decreaseFloors(curCall.getFloor());
 
       // Traverse carFloors array to look for a
       // exitCall with the same ID as tempCall
       for (let i = 0; i < this.exitCalls.length; ++i) {
         const tempExitCall = this.exitCalls[i];
 
-        if (tempExitCall.getID() != tempCall.getID()) continue;
+        if (tempExitCall.getID() != curCall.getID()) continue;
 
         this.setExitCallPassage(tempExitCall);
         this.currentPassengers.push(tempExitCall.getFloor());
@@ -155,26 +155,31 @@ export class Elevator {
         this.exitCalls.splice(i, 1);
         break;
       }
+      this.sequence.remove(curCall);
+    }
+
+    if (DEBUG) {
+      console.log(curCall);
+      console.log("checksequence---------------------------");
+      console.log(this.sequence.getHeap().map(x => (x.getType() == 1 ? "entry" : "exit")));
+      console.log(this.sequence.getHeap().map(x => (x.getDirection() == 1 ? "up" : "down")));
+      console.log(this.sequence.getHeap().map(x => x.getPassage()));
+      console.log(this.sequence.getHeap().map(x => x.getFloor()));
+      console.log(this.sequence.getHeap().map(x => x.getID()));
     }
 
     // Check the Calls in the sequence, if the sequence is not empty
     // Here we are looking for all exitCalls and entryCalls that can be removed from sequence
-    console.log("---------------------------");
-    console.log(this.sequence.getHeap().map(x => (x.getType() == 1 ? "entry" : "exit")));
-    console.log(this.sequence.getHeap().map(x => (x.getDirection() == 1 ? "up" : "down")));
-    console.log(this.sequence.getHeap().map(x => x.getFloor()));
-    console.log(this.sequence.getHeap().map(x => x.getID()));
     if (this.sequence.isEmpty()) return;
 
     // Traverse the Calls in the sequence to find out if
     // any Calls need to be remove, because their floor matches the currentFloor of the elevator
-    let i = 0;
-    while (i < this.sequence.size()) {
-      const call = this.sequence.getHeap()[i];
+    const thisFloorCalls = this.sequence.getHeap().filter(x => x.getFloor() == this.currentFloor);
+    for (const tempCall of thisFloorCalls) {
       // Remove all exitCalls whose floor is the current floor of the elevator
       // The passengers whose exitCall is the same as currentFloor have already arrived
-      if (call.getType() == CallType.EXIT && call.getFloor() == this.currentFloor) {
-        this.sequence.remove(call);
+      if (tempCall.getType() == CallType.EXIT) {
+        this.sequence.remove(tempCall);
         continue;
       }
 
@@ -182,12 +187,12 @@ export class Elevator {
       // and add exitCalls with the same ID to the sequence
       // The passengers whose entryCall is the same as currentFloor have boarded the elevator
       // and pressed a button inside the elevator (made a exitCall)
-      if (call.getType() == CallType.ENTRY && call.getFloor() == this.currentFloor) {
+      if (tempCall.getType() == CallType.ENTRY && tempCall.getFloor() == curCall.getFloor()) {
         // Traverse carFloors array
         for (let i = 0; i < this.exitCalls.length; ++i) {
           const tempExitCall = this.exitCalls[i];
 
-          if (tempExitCall.getID() != call.getID()) continue;
+          if (tempExitCall.getID() != tempCall.getID()) continue;
           this.setExitCallPassage(tempExitCall);
 
           this.currentPassengers.push(tempExitCall.getFloor());
@@ -199,65 +204,21 @@ export class Elevator {
         }
 
         // Remove the entryCall from the sequence
-        console.log("decreasing");
+        //console.log("decreasing");
         this.decreaseFloors(this.currentFloor);
-        this.sequence.remove(call);
-
-        i = 0;
-      }
-      i += 1;
-    }
-
-    console.log("---------------------------");
-    console.log(this.currentFloor);
-    console.log(this.sequence.getHeap().map(x => (x.getType() == 1 ? "entry" : "exit")));
-    console.log(this.sequence.getHeap().map(x => (x.getDirection() == 1 ? "up" : "down")));
-    console.log(this.sequence.getHeap().map(x => x.getFloor()));
-    console.log(this.sequence.getHeap().map(x => x.getID()));
-    console.log("---------------------------");
-  }
-
-  /**
-   * Assigns passage to calls in the sequence
-   */
-  private redefinePassage(): void {
-    for (const tempCall of this.sequence.getHeap()) {
-      if (!tempCall.isSpecialCall()) this.setEntryCallPassage(tempCall);
-    }
-  }
-
-  /**
-   * Animates the current position of the elevator in DOM.
-   */
-  private animateElevator(): void {
-    postMessage({
-      ID: this.ID,
-      currentFloor: this.currentFloor,
-      floors: this.getFloors(),
-      currentPassengers: this.currentPassengers.length,
-    });
-  }
-
-  /**
-   * Displays the current position of the elevator in a graphical way.
-   */
-  private displayElevator(): void {
-    console.log(`\n\nElevator ${this.ID}\n`);
-    console.log("------------------------------------------\n");
-    for (let i = 0; i < this.N; ++i) {
-      if (i == this.currentFloor) {
-        console.log(" == ");
-      } else {
-        console.log(i);
+        this.sequence.remove(tempCall);
       }
     }
-
-    if (this.direction == Dir.UP) {
-      console.log("\n\n-->");
-    } else {
-      console.log("\n\n<--");
+    if (DEBUG) {
+      console.log("checksequence2---------------------------");
+      console.log(this.currentFloor);
+      console.log(this.sequence.getHeap().map(x => (x.getType() == 1 ? "entry" : "exit")));
+      console.log(this.sequence.getHeap().map(x => (x.getDirection() == 1 ? "up" : "down")));
+      console.log(this.sequence.getHeap().map(x => x.getPassage()));
+      console.log(this.sequence.getHeap().map(x => x.getFloor()));
+      console.log(this.sequence.getHeap().map(x => x.getID()));
+      console.log("---------------------------");
     }
-    console.log("------------------------------------------\n\n");
   }
 
   /**
@@ -266,7 +227,7 @@ export class Elevator {
   private async performJob(): Promise<void> {
     if (this.sequence.size() == 0 || !this.idle) return;
     // Get Call from sequence
-    const tempCall = this.sequence.pop()!;
+    const tempCall = this.sequence.peek()!;
 
     if (DEBUG) {
       console.log("\n\n**************************");
@@ -288,20 +249,15 @@ export class Elevator {
     // on the position of the current floor
     // Since the direction has changed, we must
     // reassign passage to all calls in the sequence
-    if (tempCall.getFloor() < this.currentFloor) {
-      this.direction = Dir.DOWN;
-      this.redefinePassage();
-    } else if (tempCall.getFloor() > this.currentFloor) {
-      this.direction = Dir.UP;
-      this.redefinePassage();
-    }
+    if (tempCall.getFloor() < this.currentFloor) this.direction = Dir.DOWN;
+    else this.direction = Dir.UP;
 
+    this.redefinePassage();
     await sleep(this.c.passengerLoadingTime);
 
     // Simulate elevator movement through the floors of the building
     while (this.currentFloor != tempCall.getFloor() && this.currentFloor >= 0 && this.currentFloor <= this.N - 1) {
       this.idle = false;
-
       // Direction is up
       if (this.direction == Dir.UP && this.currentFloor != this.N - 1) {
         this.currentFloor += 1;
@@ -321,7 +277,7 @@ export class Elevator {
           `+++++ Call direction: ${tempCall.getDirection()}, Call passage: ${tempCall.getPassage()}, Call floor: ${tempCall.getFloor()}, Call type: ${tempCall.getType()}, Call ID: ${tempCall.getID()}. +++++\n\n`
         );
       }
-
+      this.redefinePassage();
       this.checkSequence(tempCall);
       this.currentPassengers = this.currentPassengers.filter(x => x != this.currentFloor);
       this.animateElevator();
@@ -372,6 +328,15 @@ export class Elevator {
     }
   }
 
+  /**
+   * Assigns passage to calls in the sequence
+   */
+  private redefinePassage(): void {
+    for (const tempCall of this.sequence.getHeap()) {
+      if (!tempCall.isSpecialCall()) this.setEntryCallPassage(tempCall);
+    }
+  }
+
   private setExitCallPassage(tempExitCall: Call) {
     // Assign passage to exitCall
     // Same direction and higher than currentFloor - P1
@@ -391,6 +356,7 @@ export class Elevator {
       }
     }
   }
+
   private setEntryCallPassage(tempCall: Call) {
     // Assign passage to a newly arrived entryCall
 
@@ -417,5 +383,39 @@ export class Elevator {
         tempCall.setPassage(2);
       }
     }
+  }
+
+  /**
+   * Animates the current position of the elevator in DOM.
+   */
+  private animateElevator(): void {
+    postMessage({
+      ID: this.ID,
+      currentFloor: this.currentFloor,
+      floors: this.getFloors(),
+      currentPassengers: this.currentPassengers.length,
+    });
+  }
+
+  /**
+   * Displays the current position of the elevator in a graphical way.
+   */
+  private displayElevator(): void {
+    console.log(`\n\nElevator ${this.ID}\n`);
+    console.log("------------------------------------------\n");
+    for (let i = 0; i < this.N; ++i) {
+      if (i == this.currentFloor) {
+        console.log(" == ");
+      } else {
+        console.log(i);
+      }
+    }
+
+    if (this.direction == Dir.UP) {
+      console.log("\n\n-->");
+    } else {
+      console.log("\n\n<--");
+    }
+    console.log("------------------------------------------\n\n");
   }
 }

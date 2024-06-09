@@ -101,7 +101,7 @@ export class CallPriorityQueue {
   }
 
   private _greater(i: number, j: number) {
-    return callComparator(this._heap[i], this._heap[j]);
+    return callComparator(this._heap[i], this._heap[j]) == -1;
   }
 
   private _swap(i: number, j: number) {
