@@ -8,7 +8,7 @@ function setUpBuilding({ floors, elevators, capacity, speed, strategy }: Setting
   const config: ElevatorConfigI = {
     passengerLoadingTime: 300, // Always 1 second
     passengerUnloadingTime: 300, // Always 1 second
-    velocity: speed / 100, // Always 1 meter per second
+    velocity: 1 / speed, // Always 1 meter per second
     capacity: capacity, // The capacity if always 1/4 of the entire building population
     interFloorHeight: 3, // Always 3 meters
   };

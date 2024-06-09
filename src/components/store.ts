@@ -38,7 +38,7 @@ const [useSettings, setSettings] = createStore<SettingsI>({
   capacity: 5,
   floors: 12,
   elevators: 2,
-  speed: 100,
+  speed: 1,
   ready: false,
   strategy: Strategies.ZONING,
 });

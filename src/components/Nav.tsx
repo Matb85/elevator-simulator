@@ -156,7 +156,7 @@ export default function SideBar(props: any) {
             <Stack direction="row" gap={1}>
               <InputNumber
                 min={1}
-                max={100}
+                max={20}
                 placeholder="Elevator speed"
                 value={settings.speed}
                 onChange={(event, val) => val && val > 0 && setSettings({ ...settings, speed: val })}
