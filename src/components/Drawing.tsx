@@ -29,8 +29,13 @@ function startWorker(settings: SettingsI) {
     for (let i = 0; i < settings.floors; i++) {
       let el2 = document.getElementById("waiting-" + i) as HTMLElement;
       el2.innerText = m.data.peopleWaiting[i];
+      if (m.data.peopleWaiting[i]) el2.classList.add("active");
+      else el2.classList.remove("active");
+
       el2 = document.getElementById("expected-" + i) as HTMLElement;
       el2.innerText = m.data.peopleExpected[i];
+      if (m.data.peopleExpected[i]) el2.classList.add("active");
+      else el2.classList.remove("active");
     }
   };
 }
