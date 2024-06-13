@@ -1,19 +1,26 @@
-import { ElevatorSystem } from "@";
-import type { ElevatorConfigI } from "@/utils";
+import { ElevatorSystem, type ElevatorConfigI, type DisplayData } from "@";
 import type { SettingsI } from "~/store";
 
 const building = new ElevatorSystem();
 
+/**
+ * Animates the current position of the elevator in DOM.
+ */
+async function animateElevator(c: DisplayData): Promise<void> {
+  postMessage(c);
+}
+
 function setUpBuilding({ floors, elevators, capacity, speed, strategy }: SettingsI) {
   const config: ElevatorConfigI = {
-    passengerLoadingTime: 300, // Always 1 second
-    passengerUnloadingTime: 300, // Always 1 second
-    velocity: 1 / speed, // Always 1 meter per second
-    capacity: capacity, // The capacity if always 1/4 of the entire building population
-    interFloorHeight: 3, // Always 3 meters
+    passengerLoadingTime: 300,
+    passengerUnloadingTime: 300,
+    velocity: 1 / speed,
+    capacity: capacity,
+    interFloorHeight: 3,
+    animate: animateElevator,
   };
 
-  building.setAlgorithm(strategy); // Sets algorithm in Building class
+  building.setAlgorithm(strategy); // Sets algorithm in the main class
   building.setFloors(floors);
   building.setElevators(elevators, config);
 }

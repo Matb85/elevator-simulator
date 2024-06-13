@@ -1,31 +1,11 @@
 import { Call } from "@/models/Call";
-import type { Passenger } from "@/models/Passenger";
 import { DEBUG } from "@/settings";
-import { sleep, Strategies, Dir, CallType } from "@/utils";
+import { Dir, CallType } from "@/utils";
 import { CallPriorityQueue } from "@/utils/PriorityQueue";
-import type { FloorTracker } from "@/models/FloorTracker";
 
-export interface ElevatorConfigI {
-  passengerLoadingTime: number; // Always 1 second
-  passengerUnloadingTime: number; // Always 1 second
-  velocity: number; // Always 1 meter per second
-  capacity: number; // The capacity if always 1/4 of the entire building population
-  interFloorHeight: number; // Always 3 meters
-  animate: (c: DisplayData) => Promise<void>;
-}
+import type { Elevator, ElevatorConfigI } from "../models/Elevator";
 
-export interface DisplayData {
-  ID: number;
-  currentFloor: number;
-  peopleWaiting: number[];
-  peopleExpected: number[];
-  currentPassengers: number;
-}
-
-export class Elevator {
-  private RUNNING = true;
-
-  private entryCalls: Call[] = [];
+export class VirtualElevator {
   private exitCalls: Call[] = [];
   public sequence: CallPriorityQueue = new CallPriorityQueue();
 
@@ -40,101 +20,19 @@ export class Elevator {
 
   public currentPassengers: number[] = [];
 
-  private floors: FloorTracker;
-
-  constructor(ID: number, algorithm: Strategies, c: ElevatorConfigI, N: number, L: number, floorTracker: FloorTracker) {
-    this.ID = ID;
-    this.N = N;
-    this.L = L;
-    this.c = c;
-
-    this.currentFloor = Math.floor(N / 2);
-    this.floors = floorTracker;
-
-    this.startPolling();
-    if (algorithm == Strategies.AFTER_AFTERNOON) {
-      // Start this thread only if user chose Up-peak
-      this.upPeakThread();
-    } else {
-      // Start this thread only if user chose Zoning
-      this.zoningThread();
-    }
-    this.animateElevator();
+  public cost = 0;
+  sleep(cost: number) {
+    this.cost += cost;
   }
 
-  /**
-   * destroy the instance by stopping the while loops
-   */
-  public destroy(): void {
-    this.RUNNING = false;
-    this.entryCalls = [];
-    this.exitCalls = [];
-  }
+  constructor(el: Elevator) {
+    this.ID = el.ID;
+    this.N = el.N;
+    this.L = el.L;
+    this.c = el.c;
 
-  /**
-   * Responsible for sorting calls assigned by the Group elevatorController
-   * into the elevator’s internal sequence list.
-   */
-  private async startPolling(): Promise<void> {
-    while (true && this.RUNNING) {
-      this.performJob();
-      await sleep(200);
-    }
-  }
-
-  /**
-   * Generates a exitCall with floor 0 in order to relocate the car to the lobby.
-   * The idea is to reduce the waiting time for future passengers arriving at the lobby.
-   */
-  private async upPeakThread(): Promise<void> {
-    while (true && this.RUNNING) {
-      // Check if the elevator is idle
-      if (this.idle) {
-        // Wait 7 seconds
-        await sleep(4000);
-        // Check if the elevator is still idle and
-        // is not already on the main floor
-        if (this.idle && this.currentFloor != 0) {
-          // Create the exitCall and add it to the sequence
-          const tempCall = new Call(0, 0, 0, "");
-          tempCall.setPassage(1);
-          tempCall.setSpecialCall(true);
-
-          this.sequence.push(tempCall);
-        }
-      }
-
-      await sleep(200);
-    }
-  }
-
-  /**
-   * Elevators in idle state are repositioned to the zone’s lowest floor.
-   */
-  private async zoningThread(): Promise<void> {
-    const Z = Math.ceil(this.N / this.L);
-
-    while (true && this.RUNNING) {
-      // Check if the elevator is idle
-      //console.log(this.ID, this.sequence.getHeap(), this.idle);
-      if (this.idle) {
-        // Wait 7 seconds
-        await sleep(4000);
-        //console.log(this.ID, this.idle, Z, this.currentFloor, this.ID * Z);
-        // Check if the elevator is still idle and
-        // is not already in it's zone
-        if (this.idle && this.currentFloor != this.ID * Z) {
-          // Create the exitCall and add it to the sequence
-          const tempCall = new Call(0, this.ID * Z, 0, "");
-          tempCall.setPassage(1);
-          tempCall.setSpecialCall(true);
-
-          this.sequence.push(tempCall);
-        }
-      }
-
-      await sleep(200);
-    }
+    this.currentFloor = el.currentFloor;
+    this.sequence.push(...el.sequence.getHeap());
   }
 
   /**
@@ -147,8 +45,6 @@ export class Elevator {
       curCall.getFloor() == this.currentFloor &&
       this.currentPassengers.length < this.c.capacity
     ) {
-      this.floors.peopleWaiting[curCall.getFloor()] -= 1;
-
       // Traverse carFloors array to look for a
       // exitCall with the same ID as tempCall
       for (let i = 0; i < this.exitCalls.length; ++i) {
@@ -218,7 +114,6 @@ export class Elevator {
 
         // Remove the entryCall from the sequence
         //console.log("decreasing");
-        this.floors.peopleWaiting[curCall.getFloor()] -= 1;
         this.sequence.remove(tempCall);
       }
     }
@@ -237,7 +132,7 @@ export class Elevator {
   /**
    * Simulates the elevator moving through the shaft
    */
-  private async performJob(): Promise<void> {
+  public performJob(): void {
     if (this.sequence.size() == 0 || !this.idle) return;
     // Get Call from sequence
     const tempCall = this.sequence.peek()!;
@@ -266,7 +161,7 @@ export class Elevator {
     else this.direction = Dir.UP;
 
     this.redefinePassage();
-    await sleep(this.c.passengerLoadingTime);
+    this.sleep(this.c.passengerLoadingTime);
 
     // Simulate elevator movement through the floors of the building
     while (this.currentFloor != tempCall.getFloor() && this.currentFloor >= 0 && this.currentFloor <= this.N - 1) {
@@ -280,7 +175,7 @@ export class Elevator {
         console.log("\n\n\n\n! + ! + ! Elevator is out of range - this.performJob() ! + ! + !\n\n\n\n");
         break;
       }
-      await sleep(this.c.velocity * this.c.interFloorHeight * 200);
+      this.sleep(this.c.velocity * this.c.interFloorHeight * 200);
 
       if (DEBUG) {
         console.log(
@@ -293,56 +188,12 @@ export class Elevator {
       this.redefinePassage();
       this.checkSequence(tempCall);
 
-      let passengersBefore = this.currentPassengers.length;
       this.currentPassengers = this.currentPassengers.filter(x => x != this.currentFloor);
-      this.floors.peopleExpected[this.currentFloor] -= passengersBefore - this.currentPassengers.length;
-
-      this.animateElevator();
-      if (DEBUG) {
-        this.displayElevator();
-      }
     }
 
-    setTimeout(() => {
-      this.idle = true;
-    }, this.c.passengerUnloadingTime);
-  }
+    this.sleep(this.c.passengerUnloadingTime);
 
-  /**
-   * Breaks apart the Passenger object.
-   * Puts Passenger.entryCall to the entryCalls array.
-   * Puts Passenger.exitCall to the exitCalls array.
-   */
-  public receiveJob(pas: Passenger): void {
-    const entryCall = pas.getEntryCall(); // Has floor, needs passage
-    const exitCall = pas.getExitCall(); // Has floor, needs passage
-
-    this.exitCalls.push(exitCall);
-
-    this.setEntryCallPassage(entryCall);
-    this.sequence.push(entryCall);
-
-    if (DEBUG) {
-      console.log("--------------------------");
-      for (const call of this.sequence.getHeap()) {
-        console.log(
-          `+++++ Call direction: ${call.getDirection()}, Call passage: ${call.getPassage()}, Call floor: ${call.getFloor()}, Call type: ${call.getType()}, Call ID: ${call.getID()}. +++++\n\n`
-        );
-      }
-      console.log("--------------------------");
-      for (const call of this.entryCalls) {
-        console.log(
-          `+++++ Call direction: ${call.getDirection()}, Call passage: ${call.getPassage()}, Call floor: ${call.getFloor()}, Call type: ${call.getType()}, Call ID: ${call.getID()}. +++++\n\n`
-        );
-      }
-      console.log("--------------------------");
-      for (const call of this.exitCalls) {
-        console.log(
-          `+++++ Call direction: ${call.getDirection()}, Call passage: ${call.getPassage()}, Call floor: ${call.getFloor()}, Call type: ${call.getType()}, Call ID: ${call.getID()}. +++++\n\n`
-        );
-      }
-      console.log("--------------------------");
-    }
+    this.idle = true;
   }
 
   /**
@@ -400,37 +251,5 @@ export class Elevator {
         tempCall.setPassage(2);
       }
     }
-  }
-
-  private animateElevator() {
-    this.c.animate({
-      ID: this.ID,
-      currentFloor: this.currentFloor,
-      peopleWaiting: this.floors.peopleWaiting,
-      peopleExpected: this.floors.peopleExpected,
-      currentPassengers: this.currentPassengers.length,
-    });
-  }
-
-  /**
-   * Displays the current position of the elevator in a graphical way.
-   */
-  private displayElevator(): void {
-    console.log(`\n\nElevator ${this.ID}\n`);
-    console.log("------------------------------------------\n");
-    for (let i = 0; i < this.N; ++i) {
-      if (i == this.currentFloor) {
-        console.log(" == ");
-      } else {
-        console.log(i);
-      }
-    }
-
-    if (this.direction == Dir.UP) {
-      console.log("\n\n-->");
-    } else {
-      console.log("\n\n<--");
-    }
-    console.log("------------------------------------------\n\n");
   }
 }

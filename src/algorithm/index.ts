@@ -1,20 +1,24 @@
-import { Elevator } from "@/models/Elevator";
+import { Elevator, type ElevatorConfigI, type DisplayData } from "@/models/Elevator";
 import { Passenger } from "@/models/Passenger";
-import { scheduleElevator } from "@/models/Scheduler";
-import { CallType, Dir, Strategies, type ElevatorConfigI } from "@/utils";
+import { scheduleElevator } from "@/scheduler";
+import { CallType, Dir, Strategies } from "@/utils";
 import { Call } from "@/models/Call";
 import { DEBUG } from "@/settings";
 import { FloorTracker } from "@/models/FloorTracker";
 
+export type { ElevatorConfigI, DisplayData };
+
 export class ElevatorSystem {
   private N: number = 0; // Number of floors
   private L: number = 0; // Number of elevators
-  private U: number = 0; // Building population
-  private algorithm: Strategies; // Desired algorithm will be passed as a CL arg
+  private algorithm: Strategies; // Desired algorithm
 
   private elevatorGroup: Elevator[] = []; // An array of L elevators
   private floors: FloorTracker; // An array of N floors
 
+  /**
+   * Updates the algorithm.
+   */
   public setAlgorithm(algorithm: Strategies) {
     this.algorithm = algorithm;
   }
@@ -22,7 +26,7 @@ export class ElevatorSystem {
   /**
    * Creates L Elevator objects in the elevatorGroup array.
    */
-  public setElevators(L: number, config: ElevatorConfigI): void {
+  public setElevators(L: number, c: ElevatorConfigI): void {
     for (let i = 0; i < this.elevatorGroup.length; ++i) {
       this.elevatorGroup[i].destroy();
     }
@@ -32,7 +36,7 @@ export class ElevatorSystem {
 
     for (let i = 0; i < this.L; ++i) {
       setTimeout(() => {
-        const el = new Elevator(i, this.algorithm, config, this.N, this.L, this.floors);
+        const el = new Elevator(i, this.algorithm, c, this.N, this.L, this.floors);
         this.elevatorGroup.push(el);
       }, i * 50);
     }
@@ -82,7 +86,7 @@ export class ElevatorSystem {
 
     // Each algorithm returns the index of the chosen elevator
     // The chosen elevator will be given a task (receive job)
-    chosenElevator = await scheduleElevator(this.elevatorGroup);
+    chosenElevator = await scheduleElevator(this.elevatorGroup, pas);
 
     this.elevatorGroup[chosenElevator].receiveJob(pas); // Assign a passenger to an elevator
   }

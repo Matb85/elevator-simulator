@@ -20,11 +20,3 @@ export enum CallType {
   EXIT,
   ENTRY,
 }
-
-export interface ElevatorConfigI {
-  passengerLoadingTime: number; // Always 1 second
-  passengerUnloadingTime: number; // Always 1 second
-  velocity: number; // Always 1 meter per second
-  capacity: number; // The capacity if always 1/4 of the entire building population
-  interFloorHeight: number; // Always 3 meters
-}

@@ -1,10 +1,10 @@
 import type { CallType, Dir } from "@/utils";
 
 export class Call {
-  private type: CallType; // 1 - entry call, 0 - exit call
+  private type: CallType;
   private passage: number = 0; // 1- P1, 2 - P2, 3 - P3
   private floor: number; // floor call - from where, car call - to where
-  private direction: Dir; // 1 - Up, 0 - Down
+  private direction: Dir;
   private ID: string;
   private specialCall: boolean;
 
