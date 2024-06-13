@@ -20,7 +20,7 @@ function setUpBuilding({ floors, elevators, capacity, speed, strategy }: Setting
     animate: animateElevator,
   };
 
-  building.setAlgorithm(strategy); // Sets algorithm in the main class
+  building.setStrategy(strategy); // Sets strategy in the main class
   building.setFloors(floors);
   building.setElevators(elevators, config);
 }

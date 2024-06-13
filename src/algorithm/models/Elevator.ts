@@ -64,7 +64,7 @@ export class Elevator {
   public N: number;
   public L: number;
 
-  constructor(ID: number, algorithm: Strategies, c: ElevatorConfigI, N: number, L: number, floorTracker: FloorTracker) {
+  constructor(ID: number, strategy: Strategies, c: ElevatorConfigI, N: number, L: number, floorTracker: FloorTracker) {
     this.ID = ID;
     this.N = N;
     this.L = L;
@@ -74,7 +74,7 @@ export class Elevator {
     this.floors = floorTracker;
 
     this.startPolling();
-    if (algorithm == Strategies.AFTER_AFTERNOON) {
+    if (strategy == Strategies.AFTER_AFTERNOON) {
       // Start this thread only if user chose Up-peak
       this.upPeakThread();
     } else {

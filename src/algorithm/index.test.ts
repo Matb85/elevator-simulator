@@ -42,7 +42,7 @@ describe("tests", () => {
   before(() => {
     building = new ElevatorSystem();
 
-    building.setAlgorithm(Strategies.BEFORE_AFTERNOON); // Sets algorithm in the main class
+    building.setStrategy(Strategies.BEFORE_AFTERNOON); // Sets strategy in the main class
     building.setFloors(N);
   });
 

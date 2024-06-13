@@ -11,16 +11,16 @@ export type { ElevatorConfigI, DisplayDataI };
 export class ElevatorSystem {
   private N: number = 0; // Number of floors
   private L: number = 0; // Number of elevators
-  private algorithm: Strategies; // Desired algorithm
+  private strategy: Strategies; // Desired algorithm
 
   private elevatorGroup: Elevator[] = []; // An array of L elevators
   private floors: FloorTracker; // An array of N floors
 
   /**
-   * Updates the algorithm.
+   * Updates the strategy.
    */
-  public setAlgorithm(algorithm: Strategies) {
-    this.algorithm = algorithm;
+  public setStrategy(strategy: Strategies) {
+    this.strategy = strategy;
   }
 
   /**
@@ -36,7 +36,7 @@ export class ElevatorSystem {
 
     for (let i = 0; i < this.L; ++i) {
       setTimeout(() => {
-        const el = new Elevator(i, this.algorithm, c, this.N, this.L, this.floors);
+        const el = new Elevator(i, this.strategy, c, this.N, this.L, this.floors);
         this.elevatorGroup.push(el);
       }, i * 50);
     }
@@ -98,7 +98,6 @@ export class ElevatorSystem {
     const pas = new Passenger(entryCall, exitCall, ID); // Create a Passenger object and add it the to the passengers array
     let chosenElevator = 0;
 
-    // Each algorithm returns the index of the chosen elevator
     // The chosen elevator will be given a task (receive job)
     chosenElevator = await scheduleElevator(this.elevatorGroup, pas);
 
