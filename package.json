@@ -1,14 +1,10 @@
 {
   "name": "avsystem-home-assignment",
-  "module": "index.ts",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "start": "bun run ./index.ts",
     "dev": "vite",
     "build": "tsc && vite build"
-  },
-  "devDependencies": {
-    "@types/bun": "latest"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
