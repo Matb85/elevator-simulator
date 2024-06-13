@@ -141,7 +141,7 @@ export default function SideBar(props: any) {
             <Typography>Settings</Typography>
 
             <Button variant="contained" onClick={() => setSettings({ ...settings, ready: true })}>
-              Update settings
+              Apply settings
             </Button>
 
             <Stack direction="row" gap={1}>
@@ -178,8 +178,16 @@ export default function SideBar(props: any) {
               defaultValue={Strategies.BEFORE_AFTERNOON}
               name="radio-buttons-group"
             >
-              <FormControlLabel value={Strategies.BEFORE_AFTERNOON} control={<Radio />} label="Morning - afternoon" />
-              <FormControlLabel value={Strategies.AFTER_AFTERNOON} control={<Radio />} label="Afternoon - evening" />
+              <FormControlLabel
+                value={Strategies.BEFORE_AFTERNOON}
+                control={<Radio />}
+                label="Morning - afternoon (wait on different floors)"
+              />
+              <FormControlLabel
+                value={Strategies.AFTER_AFTERNOON}
+                control={<Radio />}
+                label="Afternoon - evening (wait at the lobby)"
+              />
             </RadioGroup>
           </Box>
         </ListItem>
