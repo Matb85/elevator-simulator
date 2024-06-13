@@ -26,12 +26,12 @@ export class VirtualElevator {
   }
 
   constructor(el: Elevator) {
-    this.ID = el.ID;
+    this.ID = el.getID();
     this.N = el.N;
     this.L = el.L;
-    this.c = el.c;
+    this.c = el.getConfig();
 
-    this.currentFloor = el.currentFloor;
+    this.currentFloor = el.getCurrentFloor();
     this.sequence.push(...el.sequence.getHeap());
   }
 
@@ -161,7 +161,7 @@ export class VirtualElevator {
     else this.direction = Dir.UP;
 
     this.redefinePassage();
-    this.sleep(this.c.passengerLoadingTime);
+    this.sleep(this.c.loadingTime);
 
     // Simulate elevator movement through the floors of the building
     while (this.currentFloor != tempCall.getFloor() && this.currentFloor >= 0 && this.currentFloor <= this.N - 1) {
@@ -191,7 +191,7 @@ export class VirtualElevator {
       this.currentPassengers = this.currentPassengers.filter(x => x != this.currentFloor);
     }
 
-    this.sleep(this.c.passengerUnloadingTime);
+    this.sleep(this.c.unloadingTime);
 
     this.idle = true;
   }

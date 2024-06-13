@@ -5,21 +5,44 @@ import { sleep, Strategies, Dir, CallType } from "@/utils";
 import { CallPriorityQueue } from "@/utils/PriorityQueue";
 import type { FloorTracker } from "@/models/FloorTracker";
 
-export interface ElevatorConfigI {
-  passengerLoadingTime: number; // Always 1 second
-  passengerUnloadingTime: number; // Always 1 second
-  velocity: number; // Always 1 meter per second
-  capacity: number; // The capacity if always 1/4 of the entire building population
-  interFloorHeight: number; // Always 3 meters
-  animate: (c: DisplayData) => Promise<void>;
-}
-
-export interface DisplayData {
+export interface DisplayDataI {
   ID: number;
   currentFloor: number;
   peopleWaiting: number[];
   peopleExpected: number[];
+  direction: Dir;
   currentPassengers: number;
+}
+
+export interface ElevatorConfigI {
+  /**
+   * how long it takes for the passengers to enter the elevator
+   * @type unit: milliseconds
+   */
+  loadingTime: number;
+  /**
+   * how long it takes for the passengers to exit the elevator
+   * @type unit: milliseconds
+   */
+  unloadingTime: number;
+  /**
+   * average speed of the elevator
+   * @type unit: meters per second
+   */
+  velocity: number;
+  /**
+   * height of every floor
+   * @type unit: meters
+   */
+  interFloorHeight: number;
+  /**
+   * how many passengers can the elevator fit inside
+   */
+  capacity: number;
+  /**
+   * a callback for retrieving current elevator data
+   */
+  animate: (c: DisplayDataI) => Promise<void>;
 }
 
 export class Elevator {
@@ -27,20 +50,19 @@ export class Elevator {
 
   private entryCalls: Call[] = [];
   private exitCalls: Call[] = [];
+
+  private ID: number;
+  private currentFloor: number;
+  private direction: Dir = Dir.UP;
+  private idle = true;
+  private c: ElevatorConfigI;
+
+  private currentPassengers: number[] = [];
+  private floors: FloorTracker;
+
   public sequence: CallPriorityQueue = new CallPriorityQueue();
-
-  public ID: number;
-  public currentFloor: number;
-  public direction: Dir = Dir.UP;
-  public idle = true;
-
-  public c: ElevatorConfigI;
   public N: number;
   public L: number;
-
-  public currentPassengers: number[] = [];
-
-  private floors: FloorTracker;
 
   constructor(ID: number, algorithm: Strategies, c: ElevatorConfigI, N: number, L: number, floorTracker: FloorTracker) {
     this.ID = ID;
@@ -63,7 +85,47 @@ export class Elevator {
   }
 
   /**
-   * destroy the instance by stopping the while loops
+   *
+   * @returns elevator's ID
+   */
+  public getID(): number {
+    return this.ID;
+  }
+
+  /**
+   *
+   * @returns elevator's configuration
+   */
+  public getConfig(): ElevatorConfigI {
+    return this.c;
+  }
+
+  /**
+   *
+   * @returns how many passengers are inside the elevator in the moment
+   */
+  public getCurrentPassengers(): number[] {
+    return this.currentPassengers;
+  }
+
+  /**
+   *
+   * @returns which floor the elevator is on in the moment
+   */
+  public getCurrentFloor(): number {
+    return this.currentFloor;
+  }
+
+  /**
+   *
+   * @returns whether the elevator is idle or occupied
+   */
+  public isIdle(): boolean {
+    return this.idle;
+  }
+
+  /**
+   * destroys the instance by stopping the while loops
    */
   public destroy(): void {
     this.RUNNING = false;
@@ -72,8 +134,7 @@ export class Elevator {
   }
 
   /**
-   * Responsible for sorting calls assigned by the Group elevatorController
-   * into the elevator’s internal sequence list.
+   * Responsible for sorting performing awaiting calls
    */
   private async startPolling(): Promise<void> {
     while (true && this.RUNNING) {
@@ -266,7 +327,7 @@ export class Elevator {
     else this.direction = Dir.UP;
 
     this.redefinePassage();
-    await sleep(this.c.passengerLoadingTime);
+    await sleep(this.c.loadingTime);
 
     // Simulate elevator movement through the floors of the building
     while (this.currentFloor != tempCall.getFloor() && this.currentFloor >= 0 && this.currentFloor <= this.N - 1) {
@@ -298,14 +359,11 @@ export class Elevator {
       this.floors.peopleExpected[this.currentFloor] -= passengersBefore - this.currentPassengers.length;
 
       this.animateElevator();
-      if (DEBUG) {
-        this.displayElevator();
-      }
     }
 
     setTimeout(() => {
       this.idle = true;
-    }, this.c.passengerUnloadingTime);
+    }, this.c.unloadingTime);
   }
 
   /**
@@ -409,28 +467,7 @@ export class Elevator {
       peopleWaiting: this.floors.peopleWaiting,
       peopleExpected: this.floors.peopleExpected,
       currentPassengers: this.currentPassengers.length,
+      direction: this.direction,
     });
-  }
-
-  /**
-   * Displays the current position of the elevator in a graphical way.
-   */
-  private displayElevator(): void {
-    console.log(`\n\nElevator ${this.ID}\n`);
-    console.log("------------------------------------------\n");
-    for (let i = 0; i < this.N; ++i) {
-      if (i == this.currentFloor) {
-        console.log(" == ");
-      } else {
-        console.log(i);
-      }
-    }
-
-    if (this.direction == Dir.UP) {
-      console.log("\n\n-->");
-    } else {
-      console.log("\n\n<--");
-    }
-    console.log("------------------------------------------\n\n");
   }
 }

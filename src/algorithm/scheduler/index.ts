@@ -14,7 +14,9 @@ import type { Passenger } from "../models/Passenger";
  * In case every elevator already reached 80% load (number of calls > 80% elevator capacity),
  * calls will not get assigned until at least one elevator falls below this mark.
  *
- * The call is assigned to the elevator with the lowest costs.
+ * The call is assigned to the elevator with the lowest cost.
+ *
+ * @returns the ID of the elevator to assign the passenger to
  */
 export async function scheduleElevator(elevatorGroup: Elevator[], pas: Passenger): Promise<number> {
   let pick = 0;
@@ -37,9 +39,9 @@ export async function scheduleElevator(elevatorGroup: Elevator[], pas: Passenger
 
       const elevatorCost = tempEl.cost;
 
-      if (elevatorCost < cost && elevator.sequence.size() / elevator.c.capacity < 0.8) {
+      if (elevatorCost < cost && elevator.sequence.size() / elevator.getConfig().capacity < 0.8) {
         cost = elevatorCost;
-        pick = elevator.ID;
+        pick = elevator.getID();
       }
     }
 

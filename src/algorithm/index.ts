@@ -1,4 +1,4 @@
-import { Elevator, type ElevatorConfigI, type DisplayData } from "@/models/Elevator";
+import { Elevator, type ElevatorConfigI, type DisplayDataI } from "@/models/Elevator";
 import { Passenger } from "@/models/Passenger";
 import { scheduleElevator } from "@/scheduler";
 import { CallType, Dir, Strategies } from "@/utils";
@@ -6,7 +6,7 @@ import { Call } from "@/models/Call";
 import { DEBUG } from "@/settings";
 import { FloorTracker } from "@/models/FloorTracker";
 
-export type { ElevatorConfigI, DisplayData };
+export type { ElevatorConfigI, DisplayDataI };
 
 export class ElevatorSystem {
   private N: number = 0; // Number of floors
@@ -43,11 +43,25 @@ export class ElevatorSystem {
   }
 
   /**
+   * @returns elevators that are currently running
+   */
+  public getElevators(): Elevator[] {
+    return this.elevatorGroup;
+  }
+
+  /**
    * Creates N Floor objects in the floors array.
    */
   public setFloors(N: number): void {
     this.N = N;
     this.floors = new FloorTracker(N);
+  }
+
+  /**
+   * @returns how many people are waiting and how man people are expected on every floor
+   */
+  public getStatus(): FloorTracker {
+    return this.floors;
   }
 
   /**

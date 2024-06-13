@@ -1,4 +1,4 @@
-import { ElevatorSystem, type ElevatorConfigI, type DisplayData } from "@";
+import { ElevatorSystem, type ElevatorConfigI, type DisplayDataI } from "@";
 import type { SettingsI } from "~/store";
 
 const building = new ElevatorSystem();
@@ -6,14 +6,14 @@ const building = new ElevatorSystem();
 /**
  * Animates the current position of the elevator in DOM.
  */
-async function animateElevator(c: DisplayData): Promise<void> {
+async function animateElevator(c: DisplayDataI): Promise<void> {
   postMessage(c);
 }
 
 function setUpBuilding({ floors, elevators, capacity, speed, strategy }: SettingsI) {
   const config: ElevatorConfigI = {
-    passengerLoadingTime: 300,
-    passengerUnloadingTime: 300,
+    loadingTime: 300,
+    unloadingTime: 300,
     velocity: 1 / speed,
     capacity: capacity,
     interFloorHeight: 3,
