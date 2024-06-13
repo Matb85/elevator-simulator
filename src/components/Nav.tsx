@@ -73,6 +73,9 @@ export default function SideBar(props: any) {
         <ListItem>
           <Box component="section" gap={1} sx={{ display: "flex", flexDirection: "column" }}>
             <Typography>Simulation controls</Typography>
+            <Typography variant="caption">
+              Status: <b>{status.running ? "running" : "stopped"}</b>
+            </Typography>
             <Box component="section" sx={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
               <Button disabled={status.running} variant="contained" onClick={() => setStatus({ running: true })}>
                 Start
