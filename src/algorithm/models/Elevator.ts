@@ -2,8 +2,8 @@ import { Call } from "@/models/Call";
 import type { Passenger } from "@/models/Passenger";
 import { DEBUG } from "@/settings";
 import { sleep, Strategies, Dir, CallType, type ElevatorConfigI } from "@/utils";
-import { CallPriorityQueue } from "@/PriorityQueue";
-import type { FloorTracker } from "@/FloorTracker";
+import { CallPriorityQueue } from "@/utils/PriorityQueue";
+import type { FloorTracker } from "@/models/FloorTracker";
 
 export class Elevator {
   private RUNNING = true;

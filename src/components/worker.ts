@@ -1,8 +1,8 @@
-import { Building } from "@";
+import { ElevatorSystem } from "@";
 import type { ElevatorConfigI } from "@/utils";
 import type { SettingsI } from "~/store";
 
-const building = new Building();
+const building = new ElevatorSystem();
 
 function setUpBuilding({ floors, elevators, capacity, speed, strategy }: SettingsI) {
   const config: ElevatorConfigI = {
