@@ -1,8 +1,9 @@
-import type { Elevator } from "../models/Elevator";
+import { sleep } from "../utils";
+import type { Elevator } from "./Elevator";
 
-export class ThreePassage {
+export class Controller {
   /**
-   * Three Passage Group Elevator Scheduling.
+   * Elevator Scheduling.
    *
    * Estimates the costs that would result from assigning the new call to the elevator.
    *
@@ -14,7 +15,7 @@ export class ThreePassage {
    *
    * The call is assigned to the elevator with the lowest costs.
    */
-  public choseElevator(elevatorGroup: Elevator[]): number {
+  public async chooseElevator(elevatorGroup: Elevator[]): Promise<number> {
     let pick = 0;
     let flag = true;
     let cost = Number.MAX_VALUE;
@@ -39,6 +40,7 @@ export class ThreePassage {
       if (elevatorGroup[pick].sequence.size() / elevatorGroup[pick].c.capacity < 0.8) {
         flag = false;
       }
+      await sleep(500);
     }
 
     return pick;

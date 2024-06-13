@@ -1,9 +1,7 @@
 import { Elevator } from "./Elevator";
 import { Passenger } from "./Passenger";
-import { RoundRobin } from "../controllers/RoundRobin";
-import { ThreePassage } from "../controllers/ThreePassage";
-import { Zoning } from "../controllers/Zoning";
-import { CallType, Dir, Strategies, sleep, type ElevatorConfigI } from "../utils";
+import { Controller } from "./Controller";
+import { CallType, Dir, Strategies, type ElevatorConfigI } from "../utils";
 import { Call } from "./Call";
 import { DEBUG } from "../settings";
 import { FloorTracker } from "../FloorTracker";
@@ -17,14 +15,10 @@ export class Building {
   private elevatorGroup: Elevator[] = []; // An array of L elevators
   private floors: FloorTracker; // An array of N floors
 
-  private roundRobin: RoundRobin;
-  private zoning: Zoning;
-  private threePassage: ThreePassage;
+  private controller: Controller;
 
   constructor() {
-    this.roundRobin = new RoundRobin();
-    this.zoning = new Zoning();
-    this.threePassage = new ThreePassage();
+    this.controller = new Controller();
   }
 
   public setAlgorithm(algorithm: Strategies) {
@@ -72,7 +66,7 @@ export class Building {
    * Remember to assign passage number to the entryCall and exitFloor.
    * Assign Passenger ID to each call.
    */
-  public generatePassenger(entryFloor: number, exitFloor: number): void {
+  public async generatePassenger(entryFloor: number, exitFloor: number): Promise<void> {
     const ID = Math.round(Math.random() * 10 ** 6) + ""; // Create passenger ID
 
     const direction = entryFloor > exitFloor ? Dir.DOWN : Dir.UP;
@@ -94,20 +88,7 @@ export class Building {
 
     // Each algorithm returns the index of the chosen elevator
     // The chosen elevator will be given a task (receive job)
-    switch (this.algorithm) {
-      case Strategies.ROUND_ROBIN:
-        chosenElevator = this.roundRobin.choseElevator(this.elevatorGroup, this.L);
-        break;
-      case Strategies.UP_PEAK:
-        chosenElevator = this.roundRobin.choseElevator(this.elevatorGroup, this.L);
-        break;
-      case Strategies.ZONING:
-        chosenElevator = this.zoning.choseElevator(this.L, this.N, pas.getEntryCall().getFloor());
-        break;
-      case Strategies.THREE_PASSAGE:
-        chosenElevator = this.threePassage.choseElevator(this.elevatorGroup);
-        break;
-    }
+    chosenElevator = await this.controller.chooseElevator(this.elevatorGroup);
 
     this.elevatorGroup[chosenElevator].receiveJob(pas); // Assign a passenger to an elevator
   }

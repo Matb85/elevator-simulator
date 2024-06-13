@@ -21,7 +21,7 @@ export class Elevator {
   public N: number;
   public L: number;
 
-  private currentPassengers: number[] = [];
+  public currentPassengers: number[] = [];
 
   private floors: FloorTracker;
 
@@ -35,13 +35,11 @@ export class Elevator {
     this.floors = floorTracker;
 
     this.startPolling();
-    // Start this thread only if user chose Up-peak
-    if (algorithm == Strategies.UP_PEAK) {
+    if (algorithm == Strategies.AFTER_AFTERNOON) {
+      // Start this thread only if user chose Up-peak
       this.upPeakThread();
-    }
-
-    // Start this thread only if user chose Zoning
-    if (algorithm == Strategies.ZONING) {
+    } else {
+      // Start this thread only if user chose Zoning
       this.zoningThread();
     }
     this.animateElevator();

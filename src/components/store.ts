@@ -40,7 +40,7 @@ const [useSettings, setSettings] = createStore<SettingsI>({
   elevators: 2,
   speed: 1,
   ready: false,
-  strategy: Strategies.ZONING,
+  strategy: Strategies.BEFORE_AFTERNOON,
 });
 
 export { useSettings, setSettings };
