@@ -1,5 +1,5 @@
-import Nav from "./components/Nav";
-import Building from "./components/Drawing";
+import Nav from "~/Nav";
+import Building from "~/Drawing";
 
 function App() {
   return (

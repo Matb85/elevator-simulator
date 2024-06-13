@@ -1,4 +1,4 @@
-import type { CallType, Dir } from "../utils";
+import type { CallType, Dir } from "@/utils";
 
 export class Call {
   private type: CallType; // 1 - entry call, 0 - exit call

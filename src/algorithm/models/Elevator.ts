@@ -1,9 +1,9 @@
-import { Call } from "./Call";
-import type { Passenger } from "./Passenger";
-import { DEBUG } from "../settings";
-import { sleep, Strategies, Dir, CallType, type ElevatorConfigI } from "../utils";
-import { CallPriorityQueue } from "../PriorityQueue";
-import type { FloorTracker } from "../FloorTracker";
+import { Call } from "@/models/Call";
+import type { Passenger } from "@/models/Passenger";
+import { DEBUG } from "@/settings";
+import { sleep, Strategies, Dir, CallType, type ElevatorConfigI } from "@/utils";
+import { CallPriorityQueue } from "@/PriorityQueue";
+import type { FloorTracker } from "@/FloorTracker";
 
 export class Elevator {
   private RUNNING = true;

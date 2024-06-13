@@ -17,9 +17,9 @@ import {
   Typography,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import InputNumber from "./InputNumber";
-import { setGeneratePerson, setSettings, setStatus, useGeneratePerson, useSettings, useStatus } from "./store";
-import { Strategies } from "../algorithm/utils";
+import InputNumber from "~/InputNumber";
+import { setGeneratePerson, setSettings, setStatus, useGeneratePerson, useSettings, useStatus } from "~/store";
+import { Strategies } from "@/utils";
 
 let interval: ReturnType<typeof setInterval>;
 

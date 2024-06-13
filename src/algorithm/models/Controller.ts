@@ -1,5 +1,5 @@
-import { sleep } from "../utils";
-import type { Elevator } from "./Elevator";
+import { sleep } from "@/utils";
+import type { Elevator } from "@/models/Elevator";
 
 export class Controller {
   /**

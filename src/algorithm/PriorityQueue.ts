@@ -1,4 +1,4 @@
-import type { Call } from "./models/Call";
+import type { Call } from "@/models/Call";
 
 /**
  * Sorts calls based on passage and floor number

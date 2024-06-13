@@ -1,10 +1,10 @@
-import { Elevator } from "./Elevator";
-import { Passenger } from "./Passenger";
-import { Controller } from "./Controller";
-import { CallType, Dir, Strategies, type ElevatorConfigI } from "../utils";
-import { Call } from "./Call";
-import { DEBUG } from "../settings";
-import { FloorTracker } from "../FloorTracker";
+import { Elevator } from "@/models/Elevator";
+import { Passenger } from "@/models/Passenger";
+import { Controller } from "@/models/Controller";
+import { CallType, Dir, Strategies, type ElevatorConfigI } from "@/utils";
+import { Call } from "@/models/Call";
+import { DEBUG } from "@/settings";
+import { FloorTracker } from "@/FloorTracker";
 
 export class Building {
   private N: number = 0; // Number of floors

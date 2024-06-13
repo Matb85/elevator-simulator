@@ -1,18 +1,9 @@
 import { Box } from "@mui/material";
-
-import "./Drawing.css";
-
-import Worker from "./worker.ts?worker";
-import {
-  setGeneratePerson,
-  setSettings,
-  setStatus,
-  useGeneratePerson,
-  useSettings,
-  useStatus,
-  type SettingsI,
-} from "./store";
+import { setGeneratePerson, setSettings, useGeneratePerson, useSettings, useStatus, type SettingsI } from "~/store";
 import { useEffect } from "react";
+
+import "~/Drawing.css";
+import Worker from "~/worker.ts?worker";
 
 const worker = new Worker();
 

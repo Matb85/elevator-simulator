@@ -1,4 +1,4 @@
-import type { Call } from "./Call";
+import type { Call } from "@/models/Call";
 
 export class Passenger {
   private entryCall: Call;

@@ -23,7 +23,14 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false,
-    "strictPropertyInitialization": false
+    "strictPropertyInitialization": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/algorithm/*"],
+      "@": ["./src/algorithm"],
+      "~/*": ["./src/components/*"],
+      "~": ["./src/components"]
+    }
   },
   "include": ["src", "vite.config.ts"]
 }

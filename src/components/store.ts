@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import { Strategies } from "../algorithm/utils";
+import { Strategies } from "@/utils";
 
 export interface SettingsI {
   floors: number;

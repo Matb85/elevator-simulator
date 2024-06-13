@@ -1,6 +1,6 @@
-import { Building } from "../algorithm/models/Building";
-import type { ElevatorConfigI } from "../algorithm/utils";
-import type { SettingsI } from "./store";
+import { Building } from "@";
+import type { ElevatorConfigI } from "@/utils";
+import type { SettingsI } from "~/store";
 
 const building = new Building();
 
