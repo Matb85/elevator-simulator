@@ -8,6 +8,9 @@ import { FloorTracker } from "@/models/FloorTracker";
 
 export type { ElevatorConfigI, DisplayDataI };
 
+/**
+ * The main class that puts all the components of the algorithm together
+ */
 export class ElevatorSystem {
   private N: number = 0; // Number of floors
   private L: number = 0; // Number of elevators

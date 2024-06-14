@@ -55,7 +55,7 @@ The project consists of 3 parts:
 
 ## Algorithm's details
 
-The full algorithm sports comments explaining each part of the code, it is located in ./src/algorithm
+The full algorithm, located in ./src/algorithm folder, features comments explaining each part of the code, and can by use by importing and creating an instance of the ElevatorSystem class from ./src/algorithm/index.ts
 
 The most important components of the algo:
 
