@@ -1,24 +1,23 @@
-# Hello, I'm Mateusz Bis!
+# Hello, <!-- omit from toc -->
 
-## welcome to my assignment for an internship at AVSystem.
+Welcome to my assignment for internship at AVSystem!
 
-## Table of contents
+I'm Mateusz Bis and I have been asked to create this project. The recruiters, I believe, know the description of task very well, therefore I didn't paste it here. Below you cen read about my thought process, observations, goals, results and about how to use the project. Also, please, feel invited to browse all the code in the repository.
 
-- [Hello, I'm Mateusz Bis!](#hello-im-mateusz-bis)
-  - [welcome to my assignment for an internship at AVSystem.](#welcome-to-my-assignment-for-an-internship-at-avsystem)
-  - [Table of contents](#table-of-contents)
-  - [Observations](#observations)
-  - [My goals](#my-goals)
-  - [Project structure](#project-structure)
-  - [Algorithm's details](#algorithms-details)
-    - [Call class - models/Call.ts](#call-class---modelscallts)
-    - [The scheduler - scheduler/index.ts](#the-scheduler---schedulerindexts)
-    - [The elevator logic - models/Elevator.ts](#the-elevator-logic---modelselevatorts)
-  - [Run the web app](#run-the-web-app)
-  - [Use the web app](#use-the-web-app)
-  - [Run the project on the command line](#run-the-project-on-the-command-line)
-  - [Import the project in code](#import-the-project-in-code)
-  - [If I had more time...](#if-i-had-more-time)
+## Table of contents<!-- omit from toc -->
+
+- [Observations](#observations)
+- [My goals](#my-goals)
+- [Project structure](#project-structure)
+- [Algorithm's details](#algorithms-details)
+  - [Call class - models/Call.ts](#call-class---modelscallts)
+  - [The scheduler - scheduler/index.ts](#the-scheduler---schedulerindexts)
+  - [The elevator logic - models/Elevator.ts](#the-elevator-logic---modelselevatorts)
+- [Run the web app](#run-the-web-app)
+- [Use the web app](#use-the-web-app)
+- [Run the project on the command line](#run-the-project-on-the-command-line)
+- [Import the project in code](#import-the-project-in-code)
+- [If I had more time...](#if-i-had-more-time)
 
 ## Observations
 
