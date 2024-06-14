@@ -1,4 +1,4 @@
-# Hello!
+# Hello, I'm Mateusz Bis!
 ## welcome to my assignment for an internship at AVSystem.
 
 ## Table of contents
@@ -35,15 +35,16 @@ Before starting to code, I made a list of observations related to elevators in g
 
 For the project, I decided to code a solution in Typescript that:
 
-1. addresses all of the above observations
-2. Works both in a Node.js and a browser environment
-3. has a nice web UI
+1. :globe_with_meridians: is written in English, not Polish
+2. :fire: addresses all of the above observations
+3. :rocket: Works both in a Node.js and a browser environment
+4. :lipstick: has a nice web UI
 
 ## Project structure
 
 The project consists of 3 parts:
 
-1. the actual algorithm located in ./src/algorithm
+1. The actual algorithm located in ./src/algorithm
 2. A React + Material UI + Vite web app that allows to use the algo in the browser
 3. A sample test suite for playing with the algo through the command line
 
@@ -62,7 +63,7 @@ it symbolizes a request of a passenger. There are 2 types of calls:
 
 A call also has a direction, either up or down
 
-Moreover, there are 3 possible priorities:
+Moreover, there are 3 possible priorities of calls:
 
 1. Priority 0 (served first) - the person is waiting above the elevator that is going up
 2. Priority 1 - the person wants to go down, and the elevator is going down
@@ -206,10 +207,10 @@ building.generatePassenger(10, 0); // from floor 10 to floor 0
 
 I would add...
 
-1. proper unit tests for functions inside algorithm/models/Elevator.ts, algorithm/index.ts, algorithm/utils.ts
-2. proper black box integration tests for the algorithm
-3. code coverage tests
-4. prettier UI
-5. responsive design for mobile devices
-6. support for floors below zero (i.e. underground parking lots)
-7. E2E tests for the web app
+1. :test_tube: proper unit tests for functions inside algorithm/models/Elevator.ts, algorithm/index.ts, algorithm/utils.ts
+2. :test_tube: proper black box integration tests for the algorithm
+3. :rocket: code coverage tests
+4. :lipstick: prettier UI
+5. :iphone: responsive design for mobile devices
+6. :sparkles: support for floors below zero (i.e. underground parking lots)
+7. :test_tube: E2E tests for the web app
