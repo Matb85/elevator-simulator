@@ -1,8 +1,6 @@
 # Hello, <!-- omit from toc -->
 
-Welcome to my assignment for internship at AVSystem!
-
-I'm Mateusz Bis and I have been asked to create this project. The recruiters, I believe, know the description of task very well, therefore I didn't paste it here. Below you cen read about my thought process, observations, goals, results and about how to use the project. Also, please, feel invited to browse all the code in the repository.
+I'm Mateusz Bis and I have been asked by AVSytem's recruiters to create this project. Below you can read about my thought process, observations, goals, results and about how to use the project. Also, please, feel invited to browse all the code in the repository.
 
 ## Table of contents<!-- omit from toc -->
 
