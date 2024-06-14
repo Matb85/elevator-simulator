@@ -1,7 +1,7 @@
 import { sleep } from "@/utils";
 import { Elevator } from "@/models/Elevator";
-import { VirtualElevator } from "./VirtualElevator";
-import type { Passenger } from "../models/Passenger";
+import { VirtualElevator } from "@/scheduler/VirtualElevator";
+import type { Passenger } from "@/models/Passenger";
 
 /**
  * Elevator Scheduling.

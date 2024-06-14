@@ -3,7 +3,7 @@ import { DEBUG } from "@/settings";
 import { Dir, CallType } from "@/utils";
 import { CallPriorityQueue } from "@/utils/PriorityQueue";
 
-import type { Elevator, ElevatorConfigI } from "../models/Elevator";
+import type { Elevator, ElevatorConfigI } from "@/models/Elevator";
 
 /**
  * A basic implementation of elevator's logic
