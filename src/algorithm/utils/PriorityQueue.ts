@@ -48,6 +48,9 @@ const parent = (i: number) => ((i + 1) >>> 1) - 1;
 const left = (i: number) => (i << 1) + 1;
 const right = (i: number) => (i + 1) << 1;
 
+/**
+ * a basic Priority Heap queue implementation
+ */
 export class CallPriorityQueue {
   private _heap: Call[];
   top: number = 0;

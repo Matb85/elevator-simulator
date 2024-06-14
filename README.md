@@ -1,18 +1,24 @@
 # Hello, I'm Mateusz Bis!
+
 ## welcome to my assignment for an internship at AVSystem.
 
 ## Table of contents
 
-1. [Observations](#observations)
-2. [My Goals](#my-goals)
-3. [Project structure](#project-structure)
-4. [Algorithm's details](#algorithms-details)
-5. [Run the web app](#run-the-web-app)
-6. [Use the web app](#use-the-web-app)
-6. [Run the project on the command line](#run-the-project-on-the-command-line)
-6. [Import the project in code](#import-the-project-in-code)
-7. [If I had more time...](#if-i-had-more-time)
-
+- [Hello, I'm Mateusz Bis!](#hello-im-mateusz-bis)
+  - [welcome to my assignment for an internship at AVSystem.](#welcome-to-my-assignment-for-an-internship-at-avsystem)
+  - [Table of contents](#table-of-contents)
+  - [Observations](#observations)
+  - [My goals](#my-goals)
+  - [Project structure](#project-structure)
+  - [Algorithm's details](#algorithms-details)
+    - [Call class - models/Call.ts](#call-class---modelscallts)
+    - [The scheduler - scheduler/index.ts](#the-scheduler---schedulerindexts)
+    - [The elevator logic - models/Elevator.ts](#the-elevator-logic---modelselevatorts)
+  - [Run the web app](#run-the-web-app)
+  - [Use the web app](#use-the-web-app)
+  - [Run the project on the command line](#run-the-project-on-the-command-line)
+  - [Import the project in code](#import-the-project-in-code)
+  - [If I had more time...](#if-i-had-more-time)
 
 ## Observations
 
@@ -56,7 +62,7 @@ The most important components of the algo:
 
 ### Call class - models/Call.ts
 
-it symbolizes a request of a passenger. There are 2 types of calls:
+It symbolizes a request of a passenger. There are 2 types of calls:
 
 - entry Call - on which floor a person wants to enter the elevator
 - exit Call - on which floor a person wants to exit the elevator
@@ -82,7 +88,7 @@ The elevator can follow 2 different strategies while staying idle and waiting:
 1. The BEFORE_ADTERNOON strategy - during this part of the day people usually go down in order to leave the building, therefore the elevators, when idle, are spread evenly around different floors. Thanks to this displacement, they can handle plenty of traffic from various floors
 2. The AFTER_ADTERNOON strategy - during this part of the day, people usually return home and go up the floor to their flats, therefore the elevators, wait for the on floor zero.
 
-Please, feel invited to view the full code in ./src/algorithm 
+Please, feel invited to view the full code in ./src/algorithm
 
 ## Run the web app
 
@@ -105,12 +111,12 @@ $ npm run dev
 $ npm run build
 ```
 
-
 ## Use the web app
 
 <img width="795" alt="Screenshot 2024-06-14 at 01 19 21" src="https://github.com/Matb85/AVsystem-home-assignment/assets/69219238/0ea5048b-cba3-4696-9e84-5e1ac817c1a3">
 
 Features of the web app
+
 - can handle as many elevators and as many floor as you'd like
 - allows changing most of the algorithm's settings
 
@@ -127,7 +133,6 @@ The structure of the web app:
    - allows generating passengers (also automatically)
    - allows changing the algorithm's settings (click the button to actually apply the settings)
 
-  
 ## Run the project on the command line
 
 Inside ./src/algorithm/index.test.ts there is a sample test where one can easily play with the algo through the command line
@@ -153,27 +158,25 @@ $ npm run test
 import { ElevatorSystem } from "./src/algorithm";
 
 const building = new ElevatorSystem();
-
 ```
 
 2. Specify how many floors you want
 
 ```typescript
-const numberOfFloors = 20
+const numberOfFloors = 20;
 
 building.setFloors(numberOfFloors);
 ```
 
 3. Specify how many elevators you want and create a config for the elevators
 
-
 ```typescript
 import { type ElevatorConfigI, type DisplayDataI } from "./src/algorithm";
 
-const numberOfElevators = 3
+const numberOfElevators = 3;
 
 async function displayElevator(d: DisplayDataI): Promise<void> {
-  console.log(d)
+  console.log(d);
 }
 
 const config: ElevatorConfigI = {
@@ -182,7 +185,7 @@ const config: ElevatorConfigI = {
   velocity: 1,
   capacity: 8,
   interFloorHeight: 3,
-  animate: displayElevator, // a function that displays 
+  animate: displayElevator, // a function that displays
 };
 
 building.setElevators(numberOfElevators, config);
@@ -194,13 +197,12 @@ building.setElevators(numberOfElevators, config);
 import { Strategies } from "./src/algorithm/utils";
 
 building.setStrategy(Strategies.BEFORE_AFTERNOON); // Sets algorithm in the main class
-
 ```
 
 5. Finally, start generating passengers
 
 ```typescript
-building.generatePassenger(10, 0); // from floor 10 to floor 0 
+building.generatePassenger(10, 0); // from floor 10 to floor 0
 ```
 
 ## If I had more time...

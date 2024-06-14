@@ -5,6 +5,10 @@ import { CallPriorityQueue } from "@/utils/PriorityQueue";
 
 import type { Elevator, ElevatorConfigI } from "../models/Elevator";
 
+/**
+ * A basic implementation of elevator's logic
+ * The idea is to allow quickly predict how the elevators would behave with a certain input
+ */
 export class VirtualElevator {
   private exitCalls: Call[] = [];
   public sequence: CallPriorityQueue = new CallPriorityQueue();

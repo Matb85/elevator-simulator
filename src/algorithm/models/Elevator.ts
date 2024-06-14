@@ -45,6 +45,9 @@ export interface ElevatorConfigI {
   animate: (c: DisplayDataI) => Promise<void>;
 }
 
+/**
+ * implements the logic of elevators
+ */
 export class Elevator {
   private RUNNING = true;
 
