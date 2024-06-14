@@ -211,8 +211,10 @@ I would add...
 1. :test_tube: proper unit tests for functions inside algorithm/models/Elevator.ts, algorithm/index.ts, algorithm/utils.ts
 2. :test_tube: proper black box integration tests for the algorithm
 3. :rocket: code coverage tests
-4. :lipstick: prettier UI
-5. :iphone: responsive design for mobile devices
-6. :sparkles: support for floors below zero (i.e. underground parking lots)
-7. :sparkles: let every elevator have different configurations (capacity, speed, etc.)
-8. :test_tube: E2E tests for the web app
+4. :lipstick: a prettier UI
+5. :iphone: better responsive design for mobile devices
+6. :test_tube: E2E tests for the web app
+7. :sparkles: support for floors below zero (i.e. underground parking lots)
+8. :sparkles: let every elevator have different configurations (capacity, speed, etc.)
+9. :sparkles: let every elevator have floor ranges (e.g. one elevator operates between floors -2 and 20 while the other one between 0 and 20)
+10. :sparkles: convenient, built'in controls for starting and stoping the algorithm
