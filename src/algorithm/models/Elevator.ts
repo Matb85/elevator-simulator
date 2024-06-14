@@ -140,7 +140,7 @@ export class Elevator {
    * Responsible for sorting performing awaiting calls
    */
   private async startPolling(): Promise<void> {
-    while (true && this.RUNNING) {
+    while (this.RUNNING) {
       this.performJob();
       await sleep(200);
     }
@@ -151,7 +151,7 @@ export class Elevator {
    * The idea is to reduce the waiting time for future passengers arriving at the lobby.
    */
   private async upPeakThread(): Promise<void> {
-    while (true && this.RUNNING) {
+    while (this.RUNNING) {
       // Check if the elevator is idle
       if (this.idle) {
         // Wait 7 seconds
@@ -178,7 +178,7 @@ export class Elevator {
   private async zoningThread(): Promise<void> {
     const Z = Math.ceil(this.N / this.L);
 
-    while (true && this.RUNNING) {
+    while (this.RUNNING) {
       // Check if the elevator is idle
       //console.log(this.ID, this.sequence.getHeap(), this.idle);
       if (this.idle) {
@@ -357,7 +357,7 @@ export class Elevator {
       this.redefinePassage();
       this.checkSequence(tempCall);
 
-      let passengersBefore = this.currentPassengers.length;
+      const passengersBefore = this.currentPassengers.length;
       this.currentPassengers = this.currentPassengers.filter(x => x != this.currentFloor);
       this.floors.peopleExpected[this.currentFloor] -= passengersBefore - this.currentPassengers.length;
 

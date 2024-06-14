@@ -31,7 +31,7 @@ function startWorker(settings: SettingsI) {
   };
 }
 
-export default function Drawing(props: any) {
+export default function Drawing() {
   const settings = useSettings();
   const person = useGeneratePerson();
 

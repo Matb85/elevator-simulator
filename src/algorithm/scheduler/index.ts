@@ -21,7 +21,7 @@ import type { Passenger } from "@/models/Passenger";
 export async function scheduleElevator(elevatorGroup: Elevator[], pas: Passenger): Promise<number> {
   let pick = 0;
   let cost = Number.MAX_VALUE;
-
+  // eslint-disable-next-line
   while (true) {
     // Find the elevator with lowest cost
     for (const elevator of elevatorGroup) {

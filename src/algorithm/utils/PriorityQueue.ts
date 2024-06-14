@@ -124,7 +124,7 @@ export class CallPriorityQueue {
       (left(node) < this.size() && this._greater(left(node), node)) ||
       (right(node) < this.size() && this._greater(right(node), node))
     ) {
-      let maxChild = right(node) < this.size() && this._greater(right(node), left(node)) ? right(node) : left(node);
+      const maxChild = right(node) < this.size() && this._greater(right(node), left(node)) ? right(node) : left(node);
       this._swap(node, maxChild);
       node = maxChild;
     }
