@@ -213,4 +213,5 @@ I would add...
 4. :lipstick: prettier UI
 5. :iphone: responsive design for mobile devices
 6. :sparkles: support for floors below zero (i.e. underground parking lots)
-7. :test_tube: E2E tests for the web app
+7. :sparkles: let every elevator have different configurations (capacity, speed, etc.)
+8. :test_tube: E2E tests for the web app
