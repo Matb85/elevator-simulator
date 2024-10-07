@@ -110,7 +110,7 @@ $ npm run build
 
 ## Use the web app
 
-<img width="795" alt="Screenshot 2024-06-14 at 01 19 21" src="https://github.com/Matb85/AVsystem-home-assignment/assets/69219238/0ea5048b-cba3-4696-9e84-5e1ac817c1a3">
+<img width="795" alt="Screenshot 2024-06-14 at 01 19 21" src="https://github.com/Matb85/elevator-simulator/assets/69219238/0ea5048b-cba3-4696-9e84-5e1ac817c1a3">
 
 Features of the web app
 
