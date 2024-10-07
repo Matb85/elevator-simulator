@@ -5,7 +5,7 @@ import path from "path";
 // https://vitejs.dev/config/
 export default defineConfig(env => ({
   plugins: [react()],
-  base: env.mode == "production" ? "/AVsystem-home-assignment/" : "/",
+  base: env.mode == "production" ? "/elevator-simulator/" : "/",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src/algorithm"),
